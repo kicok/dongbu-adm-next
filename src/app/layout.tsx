@@ -5,6 +5,7 @@ import './globals.css';
 import SessionProviderWrapper from '../components/sessionProviderWrapper';
 import AuthStatus from '@/components/authStatus';
 import Nav from '@/components/nav';
+import DarkSwitch from '@/components/darkSwitch';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -18,15 +19,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <SessionProviderWrapper>
          <html lang="en">
             <body className={inter.className}>
-               <div className="flex flex-row">
-                  <div className="w-4/5 p-3 h-screen bg-black">{children}</div>
-                  <div className="w-1/5 p-3 h-screen bg-gray-700">
-                     <h2 className="text-3xl">Demo - frontEnd</h2>
-                     <AuthStatus />
-                     <hr />
-                     <Nav />
-                  </div>
-               </div>
+               <Nav />
+               <div>{children}</div>
+               <hr />
             </body>
          </html>
       </SessionProviderWrapper>
