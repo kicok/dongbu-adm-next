@@ -3,36 +3,29 @@
 import { MoonIcon, SunIcon } from '@heroicons/react/24/solid';
 import { useState, useEffect } from 'react';
 export default function DarkSwitch() {
-   const localStorageCheker = (): boolean => {
-      if (!localStorage['color-theme']) return false;
-      return localStorage['color-theme'] === 'dark' ? true : false;
-   };
-   const [isDark, setIsDark] = useState(localStorageCheker());
-   const darkSetButton = () => {
-      setIsDark((state) => {
-         const update = !state;
-         if (update) {
-            localStorage['color-theme'] = 'dark';
-         } else {
-            localStorage['color-theme'] = 'light';
-         }
-         return update;
-      });
+   const [darkMode, setDarkMode] = useState<boolean | undefined>(undefined);
+
+   const switchMode = () => {
+      setDarkMode(!darkMode);
    };
 
    useEffect(() => {
-      if (localStorage['color-theme'] === 'dark') {
-         document.documentElement.classList.add('dark');
+      if (darkMode) {
+         localStorage.setItem('darkMode', 'true');
+         window.document.documentElement.classList.add('dark');
+      } else if (darkMode === false) {
+         localStorage.setItem('darkMode', 'false');
+         window.document.documentElement.classList.remove('dark');
       } else {
-         document.documentElement.classList.remove('dark');
+         setDarkMode(localStorage.getItem('darkMode') === 'false'); // 초기 모드 셋팅
       }
-   }, [isDark]);
+   }, [darkMode]);
 
    return (
       <>
-         <span className="animate-spin animate-once" onClick={darkSetButton}>
-            {localStorage.getItem('color-theme') === 'dark' ? <MoonIcon width={25} color="white" /> : <SunIcon width={25} color="#000000" />}
-         </span>
+         <div className="hover:animate-spin" onClick={switchMode}>
+            {darkMode ? <MoonIcon width={25} color="white" /> : <SunIcon width={25} color="#000000" />}
+         </div>
       </>
    );
 }
