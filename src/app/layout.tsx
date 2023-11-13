@@ -3,9 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 
 import SessionProviderWrapper from '../components/sessionProviderWrapper';
-import AuthStatus from '@/components/authStatus';
 import Nav from '@/components/nav';
-import DarkSwitch from '@/components/darkSwitch';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -20,8 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
          <html lang="en">
             <body className={inter.className}>
                <Nav />
-               <div>{children}</div>
-               <hr />
+               <div className="container mx-auto">{children}</div>
             </body>
          </html>
       </SessionProviderWrapper>
