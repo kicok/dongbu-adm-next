@@ -2,26 +2,68 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
+@layer base {
+   h1 {
+      @apply text-3xl font-bold mb-2;
+   }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-}
+   h2 {
+      @apply mb-1 text-xl font-semibold;
+   }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+   input,
+   select {
+      @apply text-slate-500 p-1 mb-1 border border-slate-300 rounded-sm  outline-none;
+   }
+
+   select {
+      @apply pr-8;
+   }
+
+   .Select {
+      @apply w-32 border border-slate-300 rounded-sm  outline-none transition inline-block pr-8 cursor-pointer;
+   }
+
+   .Select .child {
+      @apply px-1 py-1;
+   }
+
+   .Select ul li {
+      @apply hover:bg-slate-100;
+   }
+
+   input[type='text'] {
+      @apply disabled:bg-slate-100;
+   }
+
+   input[type='checkbox'] {
+      @apply p-2 accent-purple-500 mb-0 mt-0.5;
+      /* check 할때의 배경색 지정 */
+   }
+
+   label {
+      @apply text-sm text-slate-700 font-medium leading-4;
+   }
+
+   .btn {
+      @apply px-4 py-2 rounded-lg  hover:transition hover:duration-300 hover:opacity-80 disabled:bg-slate-400 hover:disabled:opacity-100;
+   }
+
+   /* .btn:hover {
+      @apply transition duration-300 opacity-80;
+   } */
+
+   .btn-primary {
+      @apply bg-blue-600 text-white;
+   }
+
+   .btn-secondary {
+      @apply bg-slate-800  text-white;
+   }
+
+   /* dark, light 설정 */
+   body {
+      @apply bg-yellow-50 text-slate-900;
+      @apply dark:bg-slate-900 dark:text-white;
+   }
 }
