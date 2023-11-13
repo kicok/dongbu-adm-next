@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ArrowLongRightIcon, Bars3Icon } from '@heroicons/react/24/solid';
 import DarkSwitch from './darkSwitch';
 import AuthStatus from './authStatus';
+import Link from 'next/link';
 
 // import ArrowNarrowRightIcon from '~icons/tabler/arrow-narrow-right.tsx';
 // import MenuIcon from '~icons/tabler/menu-2.tsx';
@@ -39,8 +40,8 @@ const links: NavLink[] = [
       ],
    },
    {
-      title: 'About',
-      href: '/about',
+      title: '팝업/이벤트관리',
+      href: '/eventPopup',
    },
    {
       title: 'Contact',
@@ -52,7 +53,7 @@ const links: NavLink[] = [
 function Logo() {
    return (
       <div className="w-full text-center text-lg font-bold sm:w-fit sm:text-left">
-         <span className="text-cyan-500">Tailwind</span> <span className="dark:text-slate-100">Snippets</span>
+         <span className="text-cyan-500">Dongbu</span> <span className="dark:text-slate-500">Hotel & Resort</span>
       </div>
    );
 }
@@ -64,16 +65,16 @@ interface NavLinkProps extends React.HTMLProps<HTMLLinkElement> {
 
 function NavLink({ children, className, currentPath, href }: NavLinkProps) {
    return (
-      <a
+      <Link
          className={`
         block whitespace-nowrap px-3 py-2 text-sm font-semibold no-underline transition hover:text-slate-900 dark:hover:text-slate-50
         ${currentPath === href ? 'text-slate-900 dark:text-slate-50' : 'text-slate-400'}
         ${className}
       `}
-         href={href}
+         href={href as string}
       >
          {children}
-      </a>
+      </Link>
    );
 }
 
@@ -180,9 +181,9 @@ interface HeaderProps {
 function Header({ navLinks = links }: HeaderProps) {
    return (
       <header className="container mx-auto flex w-full items-center justify-between py-4 px-6">
-         <a href="#">
+         <Link href="#">
             <Logo />
-         </a>
+         </Link>
          <Navigation navLinks={navLinks} />
          <Navigation mobile navLinks={navLinks} />
       </header>
@@ -194,11 +195,6 @@ export default function Nav() {
    return (
       <div>
          <Header />
-         <p className="container mx-auto px-6 py-8">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis id varius turpis. Nullam ut tincidunt tellus. Nunc fermentum odio vitae
-            turpis fermentum vulputate. Morbi vel malesuada felis. Fusce vestibulum nibh id erat volutpat ullamcorper vitae sed neque. Curabitur vel
-            lobortis metus, at mollis turpis.
-         </p>
       </div>
    );
 }
