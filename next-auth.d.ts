@@ -51,7 +51,7 @@ declare module 'next-auth' {
       refreshToken: string;
       idToken: string;
       access_token: string;
-      expires_in: number;
+      expires_at: number;
       refresh_expires_in: number;
       refresh_token: string;
       token_type: string;
@@ -90,7 +90,7 @@ declare module 'next-auth/jwt' {
       user: User;
       error: string;
       id_token: string;
-      expires_in: number;
+      expires_at: number;
       refresh_token: string;
       decode: {
          realm_access: {

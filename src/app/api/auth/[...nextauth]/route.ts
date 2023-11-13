@@ -45,17 +45,21 @@ export const authOptions: NextAuthOptions = {
 
          // Persist the OAuth access_token to the token right after signin
          if (account) {
+            // console.log('account::::: ', account);
             // account is only available the first time this callbacks is called on a new session
             token.access_token = account.access_token;
             token.decode = jwtDecode(account.access_token as string);
             token.id_token = account.id_token;
-            token.expires_in = account.expires_in;
+            token.expires_at = account.expires_at;
             token.refresh_token = account.refresh_token;
+            console.log('account.expires_in :: ', account.expires_at);
             return token;
-         } else if (nowTimeStamp < token.expires_in) {
+            // } else if (nowTimeStamp < token.expires_at) {
+         } else if (nowTimeStamp < token.expires_at) {
+            console.log('nowTimeStamp < token.expires_at::' + nowTimeStamp + ' < ' + token.expires_at);
             return token;
          } else {
-            console.log('Token has expired, will refresh');
+            console.log('Token has expired, will refresh-- nowTimeStamp:' + nowTimeStamp + ', token.expires_at::' + token.expires_at);
 
             try {
                const refreshedToken = await refreshAccessToken(token);
