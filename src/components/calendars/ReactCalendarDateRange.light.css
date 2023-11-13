@@ -1,0 +1,178 @@
+.light-version .react-calendar {
+   width: 350px;
+   @media (min-width: 280px) {
+      /* Galaxy Fold*/
+      width: 265px;
+   }
+   @media (min-width: 400px) {
+      width: 390px;
+   }
+
+   max-width: 100%;
+   background: white;
+   border: 1px solid #a0a096;
+   font-family: Arial, Helvetica, sans-serif;
+   line-height: 1.125em;
+}
+
+.light-version .react-calendar--doubleView {
+   width: 700px;
+}
+
+.light-version .react-calendar--doubleView .react-calendar__viewContainer {
+   display: flex;
+   margin: -0.5em;
+}
+
+.light-version .react-calendar--doubleView .react-calendar__viewContainer > * {
+   width: 50%;
+   margin: 0.5em;
+}
+
+.light-version .react-calendar,
+.light-version .react-calendar *,
+.light-version .react-calendar *:before,
+.light-version .react-calendar *:after {
+   -moz-box-sizing: border-box;
+   -webkit-box-sizing: border-box;
+   box-sizing: border-box;
+}
+
+.light-version .react-calendar button {
+   margin: 0;
+   border: 0;
+   outline: none;
+}
+
+.light-version .react-calendar button:enabled:hover {
+   cursor: pointer;
+}
+
+.light-version .react-calendar__navigation {
+   display: flex;
+   height: 44px;
+   margin-bottom: 1em;
+}
+
+.light-version .react-calendar__navigation button {
+   min-width: 44px;
+   background: none;
+}
+
+.light-version .react-calendar__navigation button:disabled {
+   background-color: #fff;
+}
+
+.light-version .react-calendar__navigation button:enabled:hover,
+.light-version .react-calendar__navigation button:enabled:focus {
+   background-color: #e6e6e6;
+}
+
+.light-version .react-calendar__month-view__weekdays {
+   text-align: center;
+   text-transform: uppercase;
+   font-weight: bold;
+   font-size: 0.75em;
+}
+
+.light-version .react-calendar__month-view__weekdays__weekday {
+   padding: 0.5em;
+}
+
+.light-version .react-calendar__month-view__weekNumbers .light-version .react-calendar__tile {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   font-size: 0.75em;
+   font-weight: bold;
+}
+
+/* 일요일 지정 : 달력의 1번칸부터 7번째마다  */
+/* .light-version .react-calendar__month-view__days__day--weekend:nth-child(7n + 1) {
+   color: #d5285f;
+} */
+/* 토요일 지정 : 달력의 7번칸부터 7번째마다  */
+.light-version .react-calendar__month-view__days__day--weekend:nth-child(7n + 7) {
+   color: #046c09f5;
+}
+.light-version .react-calendar__month-view__days__day--weekend {
+   color: #d58181;
+}
+
+/* 이웃달의 날짜를 보여주는 부분 
+showNeighboringMonth=false 가 작동이 안되서 visibility: hidden으로 설정 */
+.light-version .react-calendar__month-view__days__day--neighboringMonth {
+   color: #757575;
+   /* visibility: hidden; */
+}
+
+.light-version .react-calendar__year-view .react-calendar__tile,
+.light-version .react-calendar__decade-view .react-calendar__tile,
+.light-version .react-calendar__century-view .react-calendar__tile {
+   padding: 2em 0.5em;
+}
+
+.light-version .react-calendar__tile {
+   max-width: 100%;
+   padding: 10px 6.6667px;
+   background: none;
+   text-align: center;
+   line-height: 16px;
+}
+
+.light-version .react-calendar__tile:disabled {
+   background-color: #f0f0f0;
+}
+
+.light-version .react-calendar__tile:enabled:hover,
+.light-version .react-calendar__tile:enabled:focus {
+   background-color: #e6e6e6;
+}
+
+.light-version .react-calendar__tile--now {
+   background: #ffff76;
+}
+
+.light-version .react-calendar__tile--now:enabled:hover,
+.light-version .react-calendar__tile--now:enabled:focus {
+   background: #ffffa9;
+}
+
+.light-version .react-calendar__tile--hasActive {
+   background: #76baff;
+}
+
+.light-version .react-calendar__tile--hasActive:enabled:hover,
+.light-version .react-calendar__tile--hasActive:enabled:focus {
+   background: #a9d4ff;
+}
+
+/* 선택된 날짜 */
+.light-version .react-calendar__tile--active {
+   background: #a2caea;
+   color: rgb(21, 21, 21);
+}
+
+/* 마지막 클릭한 날짜의 배경 */
+.light-version .react-calendar__tile--active:enabled:hover,
+.light-version .react-calendar__tile--active:enabled:focus {
+   background: #b3c9df;
+}
+
+.light-version .react-calendar--selectRange .react-calendar__tile--hover {
+   background-color: #e6e6e6;
+}
+
+/* 아래부터는 커스텀 추가 */
+.light-version .highlight {
+   background: #f3a95f;
+}
+
+.light-version .dot {
+   height: 8px;
+   width: 8px;
+   background-color: #f87171;
+   border-radius: 50%;
+   display: flex;
+   margin-left: 1px;
+}

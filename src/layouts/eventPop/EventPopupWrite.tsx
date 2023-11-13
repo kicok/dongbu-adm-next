@@ -7,15 +7,17 @@ import { object, string, number, date, InferType } from 'yup';
 import dayjs from 'dayjs';
 import ReactMultiDatepicker from '@/components/calendars/multiDatepicker/ReactMultiDatepicker';
 import SunEditorCustom, { SunEditorCustomType } from '@/components/editor/sunEditor/SunEditorCustom';
+import { redirect, useRouter } from 'next/navigation';
 
 let validationSchema = object({
    title: string().required('제목은 필수 입력 사항입니다.'),
 });
 
-export default function PopupLayout() {
+export default function EventPopupWrite() {
    const [dates, setDates] = useState<string[] | undefined>();
-
    const SunEditRef = useRef<SunEditorCustomType>(null);
+
+   const router = useRouter();
 
    // 이벤트 기간 설정
    const toParentEventDates = (value: string[] | undefined) => {
@@ -38,7 +40,7 @@ export default function PopupLayout() {
       },
 
       validationSchema: validationSchema,
-      onSubmit: (values: {}) => {
+      onSubmit: async (values: {}) => {
          console.log(JSON.stringify(values));
 
          const options = {
@@ -49,9 +51,16 @@ export default function PopupLayout() {
             body: JSON.stringify(values),
          };
 
-         fetch('/api/event', options)
-            .then((res) => res.json())
-            .then((res) => console.log(res));
+         const data = await fetch('/api/eventPopup', options)
+            // .then((res) => res.json())
+            // .then((res) => console.log(res))
+            .then((res) => {
+               if (res.status === 200) {
+                  // redirect('/eventPopup/list'); // not working
+                  // router.replace('/eventPopup/list');
+                  router.push('/eventPopup/list');
+               }
+            });
       },
    });
 

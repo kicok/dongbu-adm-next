@@ -1,0 +1,14 @@
+.rmdp-range-picker-footer button.rmdp-button {
+   display: none;
+}
+i.rmdp-cancel {
+   display: none;
+}
+
+div.rmdp-header-values {
+   text-align: center;
+}
+
+h6.rmdp-week-day {
+   display: none;
+}
