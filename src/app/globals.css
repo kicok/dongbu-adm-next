@@ -65,9 +65,13 @@
       @apply bg-slate-500  text-white;
    }
 
+   .dark-primary {
+      @apply bg-clip-text bg-gradient-to-br from-gray-700 via-slate-900 to-sky-900;
+   }
+
    /* dark, light 설정 */
    body {
       @apply bg-yellow-50 text-slate-900;
-      @apply dark:bg-slate-900 dark:text-white;
+      @apply dark:dark-primary dark:bg-fixed dark:text-white;
    }
 }
