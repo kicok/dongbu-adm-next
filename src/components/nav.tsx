@@ -40,8 +40,8 @@ const links: NavLink[] = [
       ],
    },
    {
-      title: '팝업/이벤트관리',
-      href: '/eventPopup',
+      title: '이벤트/팝업관리',
+      href: '/event/list',
    },
    {
       title: 'Contact',

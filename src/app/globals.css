@@ -54,11 +54,15 @@
    } */
 
    .btn-primary {
-      @apply bg-blue-600 text-white;
+      @apply bg-blue-400 text-white;
    }
 
    .btn-secondary {
       @apply bg-slate-800  text-white;
+   }
+
+   .btn-third {
+      @apply bg-slate-500  text-white;
    }
 
    /* dark, light 설정 */

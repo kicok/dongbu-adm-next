@@ -1,10 +1,10 @@
-import EventPopupWrite from '@/layouts/eventPop/EventPopupWrite';
+import EventWrite from '@/layouts/event/EventWrite';
 import React from 'react';
 
 export default function eventPopupWritePage() {
    return (
       <div>
-         <EventPopupWrite />
+         <EventWrite />
       </div>
    );
 }
