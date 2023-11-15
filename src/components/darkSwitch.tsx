@@ -17,7 +17,7 @@ export default function DarkSwitch() {
          localStorage.setItem('darkMode', 'false');
          window.document.documentElement.classList.remove('dark');
       } else {
-         setDarkMode(localStorage.getItem('darkMode') === 'false'); // 초기 모드 셋팅
+         setDarkMode(localStorage.getItem('darkMode') === 'true');
       }
    }, [darkMode]);
 
