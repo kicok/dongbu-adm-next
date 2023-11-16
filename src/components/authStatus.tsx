@@ -29,12 +29,13 @@ export default function AuthStatus() {
          <div>
             <span>{session.user.name}</span>{' '}
             <button
-               className="bg-blue-900 font-bold text-white py-1 px-2 rounded border border-gray-50"
+               type="button"
+               className="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-gray-800 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none dark:text-white dark:hover:bg-gray-700 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
                onClick={() => {
                   keycloakSessionLogOut().then(() => signOut({ callbackUrl: '/' }));
                }}
             >
-               Log out
+               로그아웃
             </button>
          </div>
       );
@@ -42,8 +43,12 @@ export default function AuthStatus() {
 
    return (
       <div className="my-3">
-         <button className="bg-blue-900 font-bold text-white py-1 px-2 rounded border border-gray-50" onClick={() => signIn('keycloak')}>
-            Log in
+         <button
+            type="button"
+            className="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-gray-800 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none dark:text-white dark:hover:bg-gray-700 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
+            onClick={() => signIn('keycloak')}
+         >
+            로그인
          </button>
       </div>
    );
