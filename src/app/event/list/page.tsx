@@ -1,11 +1,11 @@
 'use client';
 
-import { getEventList } from '@/app/api/event/list/getEventList';
+import { getEventList } from '@/app/api/event/get/getEventList';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-export const EventList = () => {
+export default function EventList() {
    const [eventList, setEventList] = useState<EventPopup[]>();
 
    useEffect(() => {
@@ -39,8 +39,11 @@ export const EventList = () => {
                <div className="flex flex-wrap -m-4">
                   {eventList ? (
                      eventList?.map((list) => (
-                        <div key={list.id} className="xl:w-1/4 md:w-1/2 p-4" onClick={() => router.push('/event/' + list.id)}>
-                           <div className="bg-gray-100 dark:bg-gray-600 p-6 rounded-lg">
+                        <div key={list.id} className="xl:w-1/4 md:w-1/2 p-4">
+                           <div
+                              className="bg-gray-100 dark:bg-gray-600 p-6 rounded-lg hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-neutral-500"
+                              onClick={() => router.push('/event/' + list.id)}
+                           >
                               <Image
                                  width={720}
                                  height={400}
@@ -70,4 +73,4 @@ export const EventList = () => {
          </section>
       </div>
    );
-};
+}

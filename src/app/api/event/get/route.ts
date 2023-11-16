@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authOptions } from '../../auth/[...nextauth]/route';
 import { getServerSession } from 'next-auth';
-import { getAccessToken } from '@/utils/sessionTokenAccessor';
 
+//
 export async function GET(request: NextRequest) {
    const session = await getServerSession(authOptions);
 
    if (session) {
       try {
-         const url = `${process.env.BACKEND_URL}/dongbu/event/list`;
+         const id = request.nextUrl.searchParams.get('id');
+         const url = `${process.env.BACKEND_URL}/dongbu/event/${id}`;
          const response = await fetch(url, {
             method: 'GET',
             headers: {
@@ -20,12 +21,6 @@ export async function GET(request: NextRequest) {
          if (!response.ok) {
             throw new Error('eventPop/list : something went to wrong');
          }
-
-         // return new Promise((resolve) => {
-         //    setTimeout(() => {
-         //       resolve(response);
-         //    }, 500);
-         // });
 
          const list = await response.json();
 
