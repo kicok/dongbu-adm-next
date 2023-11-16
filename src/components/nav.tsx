@@ -5,6 +5,7 @@ import { ArrowLongRightIcon, Bars3Icon } from '@heroicons/react/24/solid';
 import DarkSwitch from './darkSwitch';
 import AuthStatus from './authStatus';
 import Link from 'next/link';
+import LogoText from './logos/logoText';
 
 // import ArrowNarrowRightIcon from '~icons/tabler/arrow-narrow-right.tsx';
 // import MenuIcon from '~icons/tabler/menu-2.tsx';
@@ -22,8 +23,8 @@ const links: NavLink[] = [
       href: '/',
    },
    {
-      title: 'Services',
-      href: '#',
+      title: '배너관리',
+      href: '/banner',
       children: [
          {
             title: 'Web development',
@@ -48,15 +49,6 @@ const links: NavLink[] = [
       href: '/contact',
    },
 ];
-
-/** Logo */
-function Logo() {
-   return (
-      <div className="w-full text-center text-lg font-bold sm:w-fit sm:text-left">
-         <span className="text-cyan-500">Dongbu</span> <span className="dark:text-slate-500">Hotel & Resort</span>
-      </div>
-   );
-}
 
 /** NavLink */
 interface NavLinkProps extends React.HTMLProps<HTMLLinkElement> {
@@ -181,8 +173,8 @@ interface HeaderProps {
 function Header({ navLinks = links }: HeaderProps) {
    return (
       <header className="container mx-auto flex w-full items-center justify-between py-4 px-6">
-         <Link href="#">
-            <Logo />
+         <Link href="/">
+            <LogoText />
          </Link>
          <Navigation navLinks={navLinks} />
          <Navigation mobile navLinks={navLinks} />

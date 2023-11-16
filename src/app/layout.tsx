@@ -4,6 +4,7 @@ import './globals.css';
 
 import SessionProviderWrapper from '../components/sessionProviderWrapper';
 import Nav from '@/components/nav';
+import Footer from '@/components/footer';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -18,7 +19,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
          <html lang="en">
             <body className={inter.className}>
                <Nav />
-               <div className="container mx-auto">{children}</div>
+               <div className="container mx-auto px-5 rounded-lg px-6 py-8 ring-1 ring-slate-900/5 shadow-xl">{children}</div>
+               <Footer />
             </body>
          </html>
       </SessionProviderWrapper>
