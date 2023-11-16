@@ -9,9 +9,8 @@ import { NextResponse } from 'next/server';
 export default withAuth(
    // `withAuth` augments your `Request` with the user's token
    function (request: NextRequestWithAuth) {
-      console.log('pathname', request.nextUrl.pathname);
-      console.log('token', request.nextauth.token);
-
+      // console.log('pathname', request.nextUrl.pathname);
+      // console.log('token', request.nextauth.token);
       // if (request.nextUrl.pathname.startsWith('/extra') && request.nextauth.token?.role !== 'admin') {
       //    return NextResponse.rewrite(new URL('/denied', request.url));
       // }
