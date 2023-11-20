@@ -6,9 +6,7 @@ import DarkSwitch from './darkSwitch';
 import AuthStatus from './authStatus';
 import Link from 'next/link';
 import LogoText from './logos/logoText';
-
-// import ArrowNarrowRightIcon from '~icons/tabler/arrow-narrow-right.tsx';
-// import MenuIcon from '~icons/tabler/menu-2.tsx';
+import { usePathname } from 'next/navigation';
 
 /** Links */
 interface NavLink {
@@ -25,28 +23,28 @@ const links: NavLink[] = [
    {
       title: '배너관리',
       href: '/banner',
-      children: [
-         {
-            title: 'Web development',
-            href: '/services/web-development',
-         },
-         {
-            title: 'Digital marketing',
-            href: '/services/digital-marketing',
-         },
-         {
-            title: 'Brand strategy',
-            href: '/services/brand-strategy',
-         },
-      ],
+      // children: [
+      //    {
+      //       title: 'Web development',
+      //       href: '/services/web-development',
+      //    },
+      //    {
+      //       title: 'Digital marketing',
+      //       href: '/services/digital-marketing',
+      //    },
+      //    {
+      //       title: 'Brand strategy',
+      //       href: '/services/brand-strategy',
+      //    },
+      // ],
    },
    {
       title: '이벤트/팝업관리',
       href: '/event/list',
    },
    {
-      title: 'Contact',
-      href: '/contact',
+      title: '가맹안내 문의관리',
+      href: '/brg',
    },
 ];
 
@@ -56,11 +54,20 @@ interface NavLinkProps extends React.HTMLProps<HTMLLinkElement> {
 }
 
 function NavLink({ children, className, currentPath, href }: NavLinkProps) {
+   let isSame: boolean;
+   if (currentPath) {
+      if (currentPath === '/') {
+         isSame = href === currentPath;
+      } else {
+         isSame = href!.startsWith(currentPath);
+      }
+   } else isSame = false;
+
    return (
       <Link
          className={`
         block whitespace-nowrap px-3 py-2 text-sm font-semibold no-underline transition hover:text-slate-900 dark:hover:text-slate-50
-        ${currentPath === href ? 'text-slate-900 dark:text-slate-50' : 'text-slate-400'}
+        ${isSame ? 'text-slate-900 dark:text-slate-50' : 'text-slate-400'}
         ${className}
       `}
          href={href as string}
@@ -77,6 +84,10 @@ interface NavigationProps {
 }
 
 function Navigation({ mobile = false, navLinks = [] }: NavigationProps) {
+   const pathname = usePathname();
+   const pathnames = pathname.split('/');
+   const currentPath = '/' + pathnames[1] ?? '/';
+
    const [mobileNavigationOpened, setMobileNavigationOpened] = useState(false);
 
    const navClassName = `
@@ -139,7 +150,7 @@ function Navigation({ mobile = false, navLinks = [] }: NavigationProps) {
                )}
                {navLinks.map(({ title, href, children }) => (
                   <li className={navListItemClassName} key={href}>
-                     <NavLink className={navListLinkClassName} currentPath="/contact" href={href}>
+                     <NavLink className={navListLinkClassName} currentPath={currentPath} href={href}>
                         {title}
                      </NavLink>
                      {!!children?.length && (
