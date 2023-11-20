@@ -22,10 +22,10 @@ export default function DarkSwitch() {
    }, [darkMode]);
 
    return (
-      <>
-         <div className="hover:animate-spin" onClick={switchMode}>
+      <div className="flex justify-end">
+         <div className="hover:animate-spin hover:cursor-pointer mr-10" onClick={switchMode}>
             {darkMode ? <MoonIcon width={25} color="white" /> : <SunIcon width={25} color="#000000" />}
          </div>
-      </>
+      </div>
    );
 }
