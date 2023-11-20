@@ -1,6 +1,7 @@
 'use client';
 
 import { getEvent } from '@/app/api/event/get/getEvent';
+import HTMLReactParser from 'html-react-parser';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
@@ -48,7 +49,7 @@ export default function EventPageById({ params }: { params: { id: string } }) {
                <div className="mb-5 text-base text-gray-500 md:text-lg">수정일: {data?.modifyDate}</div>
 
                <div className="prose"></div>
-               {data?.content}
+               {HTMLReactParser(data?.content)}
             </div>
          ) : (
             <div className="mx-auto">존재하지 않는 게시글입니다.</div>
