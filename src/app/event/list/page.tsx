@@ -55,7 +55,7 @@ export default function EventList() {
                                  {list.isUse === 0 ? '사용안함' : '사용중'}
                               </h3>
                               <h2 className="text-lg text-gray-900 font-medium title-font mb-4">{list.title}</h2>
-                              <p className="leading-relaxed text-base dark:text-white">{tagRemove(list.content)}</p>
+                              <p className="truncate leading-relaxed text-base dark:text-white">{tagRemove(list.content)}</p>
                               <div className=" p-2 text-sm text-gray-400 text-end">
                                  <div>시작일 : {list.startDate} </div>
                                  <div>종료일 : {list.endDate} </div>
