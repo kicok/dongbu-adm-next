@@ -6,16 +6,18 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function EventList() {
+   const [eventData, setEventData] = useState<EventPageData>();
    const [eventList, setEventList] = useState<EventPopup[]>();
 
    useEffect(() => {
       const fetchData = async () => {
-         const lists = await getEventList();
-         setEventList(lists);
+         const data = await getEventList();
+         setEventData(data);
+         setEventList(eventData?.content);
       };
 
       fetchData();
-   }, []);
+   }, [eventData]);
 
    const router = useRouter();
 
@@ -38,7 +40,7 @@ export default function EventList() {
                <div className="flex flex-wrap w-full mb-20"></div>
                <div className="flex flex-wrap -m-4">
                   {eventList ? (
-                     eventList?.map((list) => (
+                     eventList.map((list) => (
                         <div key={list.id} className="xl:w-1/4 md:w-1/2 p-4">
                            <div
                               className="bg-gray-100 dark:bg-gray-600 p-6 rounded-lg hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-neutral-500"

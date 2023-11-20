@@ -13,3 +13,30 @@ type EventPopup = {
    title: string;
    username: string;
 };
+
+type PageSort = {
+   empty: boolean;
+   sorted: boolean;
+   unsorted: boolean;
+};
+type Pageable = {
+   offset: number;
+   sort: PageSort;
+   pageNumber: number;
+   pageSize: number;
+   paged: boolean;
+   unpaged: boolean;
+};
+
+type EventPageData = {
+   totalPages: number;
+   totalElements: number;
+   size: number;
+   content: EventPopup[];
+   number: number;
+   sort: PageSort;
+   pageable: Pageable;
+   first: boolean;
+   last: boolean;
+   empty: boolean;
+};

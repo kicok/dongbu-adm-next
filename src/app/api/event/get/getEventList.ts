@@ -11,5 +11,5 @@ export const getEventList = async () => {
       throw new Error('something went to wrong');
    }
 
-   return (await response.json()) as EventPopup[];
+   return (await response.json()) as EventPageData;
 };
