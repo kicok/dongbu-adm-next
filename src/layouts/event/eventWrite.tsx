@@ -19,7 +19,7 @@ export default function EventWrite({ event }: { event?: EventPopup }) {
    const SunEditRef = useRef<SunEditorCustomType>(null);
 
    // DB에서 호출해온 이벤트 데이터 초기 셋팅
-   const [title, setTitle] = useState<string>('');
+
    const [content, setContent] = useState<string>('');
 
    const router = useRouter();
@@ -62,33 +62,28 @@ export default function EventWrite({ event }: { event?: EventPopup }) {
          console.log(JSON.stringify(values));
 
          const options = {
-            method: 'POST',
+            method: event ? 'PUT' : 'POST',
             headers: {
                'Content-Type': 'application/json',
             },
             body: JSON.stringify(values),
          };
 
-         const data = await fetch('/api/event', options)
-            // .then((res) => res.json())
-            // .then((res) => console.log(res))
-            .then((res) => {
-               if (res.status === 200) {
-                  // redirect('/eventPopup/list'); // not working
-                  // router.replace('/eventPopup/list');
-                  router.push('/event/list');
-               }
-            });
+         //신규 글쓰기 : /api/event/
+         //글수정 : /api/event/put
+         const url = event ? '/api/event/put' : '/api/event/';
+         const data = await fetch(url, options).then((res) => {
+            if (res.status === 200) {
+               router.push('/event/list');
+            }
+         });
       },
    });
 
    const submitForm = (e?: React.FormEvent<HTMLFormElement>) => {
       e?.preventDefault();
 
-      let val = SunEditRef.current?.SunEditorCustomGetValue(); // 에디터 value
-      val = val === '<p><br></p>' ? '' : val;
-
-      formik.setFieldValue('content', val);
+      getContent();
 
       if (dates) {
          formik.setFieldValue('startDate', dates[0]);
@@ -101,7 +96,7 @@ export default function EventWrite({ event }: { event?: EventPopup }) {
    // 글 수정할때 페이지 로딩시 데이터 초기화
    useEffect(() => {
       if (event) {
-         setTitle(event.title);
+         formik.setFieldValue('id', event.id); // 글 수정시에 필요한 id (uuid)
          formik.setFieldValue('title', event.title);
          setContent(event.content);
          setDates([event.startDate, event.endDate]);
@@ -112,6 +107,16 @@ export default function EventWrite({ event }: { event?: EventPopup }) {
    if (formik.touched.title && Boolean(formik.errors.title)) {
       console.log('touch');
    }
+
+   const getContent = () => {
+      //validate 체크를 위해서 값을 총 두번 가져와야 한다.
+      // 글 등록 버튼 onClick 이벤트때 한번
+      // 바고 직후 submit 할때 한번 더 ...
+      let val = SunEditRef.current?.SunEditorCustomGetValue(); // 에디터 value
+      val = val === '<p><br></p>' ? '' : val;
+
+      formik.setFieldValue('content', val);
+   };
    return (
       <div>
          <div className="flex justify-end">
@@ -151,7 +156,7 @@ export default function EventWrite({ event }: { event?: EventPopup }) {
                <SunEditorCustom ref={SunEditRef} dbContent={content} />
                <span className="w-full text-red-500 text-sm">{formik.touched.content && formik.errors.content}</span>
                <div className="flex justify-end">
-                  <button type="submit" className="btn btn-third my-10">
+                  <button type="submit" className="btn btn-third my-10" onClick={getContent}>
                      글 등록
                   </button>
                </div>

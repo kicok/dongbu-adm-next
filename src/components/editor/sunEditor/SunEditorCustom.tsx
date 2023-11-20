@@ -14,7 +14,7 @@ export type SunEditorCustomType = {
    SunEditorCustomGetValue: () => string;
 };
 
-const SunEditorCustom = forwardRef<SunEditorCustomType, {}>((props, ref) => {
+const SunEditorCustom = forwardRef<SunEditorCustomType, { dbContent: string }>((props, ref) => {
    const editor = useRef<SunEditorCore>();
 
    const [value, setValue] = useState('');
@@ -154,6 +154,13 @@ const SunEditorCustom = forwardRef<SunEditorCustomType, {}>((props, ref) => {
       return true;
    };
 
+   const handleImageUploadBefore2 = (files: Array<File>, info: object, uploadHandler: UploadBeforeHandler) => {
+      async () => {};
+      return true;
+   };
+
+   // const handleImageUploadBefore = (files: Array<File>, info: object, uploadHandler: UploadBeforeHandler) => {
+
    const buttonList = [
       // default
       ['undo', 'redo'],
@@ -173,9 +180,10 @@ const SunEditorCustom = forwardRef<SunEditorCustomType, {}>((props, ref) => {
       <div>
          <SunEditor
             getSunEditorInstance={getSunEditorInstance}
-            // setContents="aaa"
+            setContents={props.dbContent}
             placeholder="내용을 입력하세요"
             onChange={handleChange}
+            height="50vh"
             setOptions={{
                buttonList: buttonList,
             }}
