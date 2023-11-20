@@ -19,7 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
          <html lang="en">
             <body className={inter.className}>
                <Nav />
-               <div className="container mx-auto px-5 rounded-lg px-6 py-8 ring-1 ring-slate-900/5 shadow-xl">{children}</div>
+               <div className="container mx-auto px-5 rounded-lg py-8 ring-1 ring-slate-100/5 shadow-xl">{children}</div>
                <Footer />
             </body>
          </html>
