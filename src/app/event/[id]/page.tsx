@@ -17,8 +17,20 @@ export default function EventPageById({ params }: { params: { id: string } }) {
       fetchData();
    }, [params.id]);
 
-   const deleteCheck = () => {
+   const deleteCheck = async () => {
       if (confirm('글을 정말 삭제하시겠습니까?')) {
+         const options = {
+            method: 'PUT',
+            headers: {
+               'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id: params.id, del: true }),
+         };
+         const data = await fetch('/api/event/del', options).then((res) => {
+            if (res.status === 200) {
+               router.push('/event/list');
+            }
+         });
       }
    };
 
