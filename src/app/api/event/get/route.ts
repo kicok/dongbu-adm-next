@@ -8,8 +8,25 @@ export async function GET(request: NextRequest) {
 
    if (session) {
       try {
+         // id => list || uuid
          const id = request.nextUrl.searchParams.get('id');
-         const url = `${process.env.BACKEND_URL}/dongbu/event/${id}`;
+
+         let url = '';
+
+         let searchParams = '';
+         if (id === 'list') {
+            let params: string[] = [];
+            params.push('page=' + request.nextUrl.searchParams.get('page'));
+            params.push('useCheck=' + request.nextUrl.searchParams.get('useCheck'));
+
+            searchParams = params.join('&');
+
+            url = `${process.env.BACKEND_URL}/dongbu/event/list?${searchParams}`;
+         } else {
+            url = `${process.env.BACKEND_URL}/dongbu/event/${id}`;
+         }
+         // console.log('url:: ', url);
+
          const response = await fetch(url, {
             method: 'GET',
             headers: {

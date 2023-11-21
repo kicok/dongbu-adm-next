@@ -1,7 +1,7 @@
 import { getBaseUrl } from '@/utils/getBaseUrl';
 
-export const getEventList = async () => {
-   const response = await fetch(`${getBaseUrl()}/api/event/get?id=list`, {
+export const getEventList = async (page: number, useCheck: number) => {
+   const response = await fetch(`${getBaseUrl()}/api/event/get?id=list&page=${page}&useCheck=${useCheck}`, {
       next: {
          revalidate: 300, // second
       },

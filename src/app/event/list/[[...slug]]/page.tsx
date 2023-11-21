@@ -2,16 +2,26 @@
 
 import { getEventList } from '@/app/api/event/get/getEventList';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
-export default function EventList() {
+type Props = {
+   params: {
+      slug: string[];
+   };
+};
+
+export default function EventList({ params }: Props) {
+   const page = params.slug?.[0] ?? 1;
+   const useCheck = params.slug?.[1] ?? 0;
+
    const [eventData, setEventData] = useState<EventPageData>();
 
    const fetchMemoCallback = useCallback(async () => {
-      const data = await getEventList();
+      const data = await getEventList(+page, +useCheck);
       setEventData(data);
-   }, []);
+   }, [page, useCheck]);
 
    useEffect(() => {
       fetchMemoCallback();
@@ -27,6 +37,15 @@ export default function EventList() {
       return content;
    };
 
+   const tabStyleActive = 'inline-block p-4 text-blue-600 bg-gray-100 rounded-t-lg active dark:bg-gray-800 dark:text-blue-500';
+
+   const tabStyle = 'inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300';
+
+   const tabClass = [
+      +useCheck === 1 ? tabStyleActive : tabStyle, // [사용중]턉
+      +useCheck === 0 ? tabStyleActive : tabStyle, // [사용안함] 탭
+   ];
+
    return (
       <div>
          <div className="flex justify-end">
@@ -34,12 +53,23 @@ export default function EventList() {
                이벤트 글쓰기
             </button>
          </div>
-
+         <ul className="flex flex-wrap text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400">
+            <li className="me-2">
+               <Link href="/event/list/1/1" aria-current="page" className={tabClass[0]}>
+                  사용함
+               </Link>
+            </li>
+            <li className="me-2">
+               <Link href="/event/list" className={tabClass[1]}>
+                  사용안함
+               </Link>
+            </li>
+         </ul>
          <section className="text-gray-600 body-font">
             <div className="container px-5 py-1 mx-auto">
                <div className="flex flex-wrap w-full mb-20"></div>
                <div className="flex flex-wrap -m-4">
-                  {eventList ? (
+                  {eventList?.length ? (
                      eventList.map((list) => (
                         <div key={list.id} className="xl:w-1/4 md:w-1/2 p-4">
                            <div
@@ -68,7 +98,7 @@ export default function EventList() {
                         </div>
                      ))
                   ) : (
-                     <div className="mx-auto dark:text-white">작성된 이벤트가 없습니다.</div>
+                     <div className="mx-auto dark:text-white pb-10">작성된 이벤트가 없습니다.</div>
                   )}
                </div>
             </div>
