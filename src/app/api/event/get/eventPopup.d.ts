@@ -7,11 +7,12 @@ type EventPopup = {
    endDate: string;
    firstname: string;
    flag: string;
-   isUse: number;
+   useCheck: number;
    lastname: string;
    startDate: string;
    title: string;
    username: string;
+   del: number;
 };
 
 type PageSort = {

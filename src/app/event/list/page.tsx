@@ -3,21 +3,21 @@
 import { getEventList } from '@/app/api/event/get/getEventList';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export default function EventList() {
    const [eventData, setEventData] = useState<EventPageData>();
-   const [eventList, setEventList] = useState<EventPopup[]>();
+
+   const fetchMemoCallback = useCallback(async () => {
+      const data = await getEventList();
+      setEventData(data);
+   }, []);
 
    useEffect(() => {
-      const fetchData = async () => {
-         const data = await getEventList();
-         setEventData(data);
-         setEventList(eventData?.content);
-      };
+      fetchMemoCallback();
+   }, [fetchMemoCallback]);
 
-      fetchData();
-   }, [eventData]);
+   const eventList = eventData?.content;
 
    const router = useRouter();
 
@@ -54,7 +54,7 @@ export default function EventList() {
                                  alt="content"
                               />
                               <h3 className="tracking-widest text-indigo-500 dark:text-indigo-200 text-xs font-medium title-font">
-                                 {list.isUse === 0 ? '사용안함' : '사용중'}
+                                 {list.useCheck === 0 ? '사용안함' : '사용중'}
                               </h3>
                               <h2 className="text-lg text-gray-900 font-medium title-font mb-4">{list.title}</h2>
                               <p className="truncate leading-relaxed text-base dark:text-white">{tagRemove(list.content)}</p>
