@@ -8,6 +8,7 @@ import dayjs from 'dayjs';
 import ReactMultiDatepicker from '@/components/calendars/multiDatepicker/ReactMultiDatepicker';
 import SunEditorCustom, { SunEditorCustomType } from '@/components/editor/sunEditor/SunEditorCustom';
 import { useRouter } from 'next/navigation';
+import Toggle from '@/components/toggle';
 
 let validationSchema = object({
    title: string().required('제목은 필수 입력 사항입니다.'),
@@ -17,8 +18,8 @@ let validationSchema = object({
 export default function EventWrite({ event }: { event?: EventPopup }) {
    const [dates, setDates] = useState<string[] | undefined>();
    const SunEditRef = useRef<SunEditorCustomType>(null);
-
-   // DB에서 호출해온 이벤트 데이터 초기 셋팅
+   const [useCheck, setUseCheck] = useState<boolean>(true);
+   const [useCheckMsg, setUseCheckMsg] = useState<string>('사용함');
 
    const [content, setContent] = useState<string>('');
 
@@ -93,6 +94,7 @@ export default function EventWrite({ event }: { event?: EventPopup }) {
       formik.handleSubmit();
    };
 
+   // DB에서 호출해온 이벤트 데이터 초기 셋팅
    // 글 수정할때 페이지 로딩시 데이터 초기화
    useEffect(() => {
       if (event) {
@@ -100,6 +102,7 @@ export default function EventWrite({ event }: { event?: EventPopup }) {
          formik.setFieldValue('title', event.title);
          setContent(event.content);
          setDates([event.startDate, event.endDate]);
+         setUseCheck(event.useCheck);
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [event]);
@@ -116,6 +119,15 @@ export default function EventWrite({ event }: { event?: EventPopup }) {
       val = val === '<p><br></p>' ? '' : val;
 
       formik.setFieldValue('content', val);
+      formik.setFieldValue('useCheck', useCheck);
+   };
+
+   useEffect(() => {
+      useCheck ? setUseCheckMsg('사용함') : setUseCheckMsg('사용안함');
+   }, [useCheck]);
+
+   const handleToggle = () => {
+      setUseCheck((check) => !check);
    };
    return (
       <div>
@@ -127,6 +139,12 @@ export default function EventWrite({ event }: { event?: EventPopup }) {
 
          <form onSubmit={submitForm} className="my-20">
             <div>
+               <div className="flex max-md:flex-col">
+                  <div className="w-40">사용 여부</div>
+                  <div className="w-full">
+                     <Toggle useCheck={useCheck} onChange={handleToggle} msg={useCheckMsg} />
+                  </div>
+               </div>
                <div className="flex max-md:flex-col">
                   <div className="w-40">이벤트 기간</div>
                   <div className="w-full">
