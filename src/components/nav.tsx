@@ -40,7 +40,7 @@ const links: NavLink[] = [
    },
    {
       title: '이벤트/팝업관리',
-      href: '/event/list',
+      href: '/event/list/1/1',
    },
    {
       title: '가맹안내 문의관리',
