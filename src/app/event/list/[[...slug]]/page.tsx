@@ -1,6 +1,7 @@
 'use client';
 
 import { getEventList } from '@/app/api/event/get/getEventList';
+import Pagination from '@/components/paging/pagination';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -13,13 +14,13 @@ type Props = {
 };
 
 export default function EventList({ params }: Props) {
-   const page = params.slug?.[0] ?? 1;
-   const useCheck = params.slug?.[1] ?? 0;
+   let page = +(params.slug?.[0] ?? 1); // 현재 페이지 number
+   let useCheck = +(params.slug?.[1] ?? 0); // [사용중] 이벤트 인지 여부
 
    const [eventData, setEventData] = useState<EventPageData>();
 
    const fetchMemoCallback = useCallback(async () => {
-      const data = await getEventList(+page, +useCheck);
+      const data = await getEventList(page, useCheck);
       setEventData(data);
    }, [page, useCheck]);
 
@@ -45,6 +46,11 @@ export default function EventList({ params }: Props) {
       +useCheck === 1 ? tabStyleActive : tabStyle, // [사용중]턉
       +useCheck === 0 ? tabStyleActive : tabStyle, // [사용안함] 탭
    ];
+
+   //  페이지 버튼 클릭 시 url 변경
+   const handleChangePage = (page: number) => {
+      router.push(`/event/list/${page}/1`, undefined);
+   };
 
    return (
       <div>
@@ -101,6 +107,16 @@ export default function EventList({ params }: Props) {
                      <div className="mx-auto dark:text-white pb-10">작성된 이벤트가 없습니다.</div>
                   )}
                </div>
+
+               {eventData?.content.length && (
+                  <Pagination
+                     currentPage={eventData.pageable.pageNumber + 1}
+                     //pageNumber는 0부터 시작하기 때문에 +1을 한다.
+                     totalPageCount={eventData.totalPages}
+                     limitPageCount={eventData.pageable.pageSize}
+                     onChange={handleChangePage}
+                  />
+               )}
             </div>
          </section>
       </div>
