@@ -49,7 +49,8 @@ export default function EventList({ params }: Props) {
 
    //  페이지 버튼 클릭 시 url 변경
    const handleChangePage = (page: number) => {
-      router.push(`/event/list/${page}/1`, undefined);
+      // useCheck ? 사용함 : 사용안함
+      useCheck ? router.push(`/event/list/${page}/1`) : router.push(`/event/list/${page}/0`);
    };
 
    return (
@@ -90,7 +91,7 @@ export default function EventList({ params }: Props) {
                                  alt="content"
                               />
                               <h3 className="tracking-widest text-indigo-500 dark:text-indigo-200 text-xs font-medium title-font">
-                                 {list.useCheck === 0 ? '사용안함' : '사용중'}
+                                 {list.useCheck ? '사용함' : '사용안함'}
                               </h3>
                               <h2 className="text-lg text-gray-900 font-medium title-font mb-4">{list.title}</h2>
                               <p className="truncate leading-relaxed text-base dark:text-white">{tagRemove(list.content)}</p>

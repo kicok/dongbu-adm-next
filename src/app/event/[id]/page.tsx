@@ -54,7 +54,7 @@ export default function EventPageById({ params }: { params: { id: string } }) {
          {data ? (
             <div className="w-full mb-12  border rounded-lg p-10 my-12">
                <div className="tracking-widest text-indigo-500 dark:text-indigo-200 text-xs font-medium title-font">
-                  {data?.useCheck === 0 ? '사용안함' : '사용중'}
+                  {data?.useCheck ? '사용함' : '사용안함'}
                </div>
                <h1 className="mb-1 text-2xl font-bold  md:leading-tight md:text-3xl">{data?.title}</h1>
 

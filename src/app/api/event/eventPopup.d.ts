@@ -7,7 +7,7 @@ type EventPopup = {
    endDate: string;
    firstname: string;
    flag: string;
-   useCheck: number;
+   useCheck: boolean;
    lastname: string;
    startDate: string;
    title: string;
