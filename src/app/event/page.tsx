@@ -1,4 +1,4 @@
-import EventWrite from '@/layouts/event/eventWrite';
+import EventWrite from '@/layouts/eventWrite';
 import React from 'react';
 
 export default function eventWrite() {
