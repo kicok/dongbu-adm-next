@@ -22,7 +22,7 @@ const links: NavLink[] = [
    },
    {
       title: '배너관리',
-      href: '/banner',
+      href: '/banner/list/1/1',
       // children: [
       //    {
       //       title: 'Web development',
