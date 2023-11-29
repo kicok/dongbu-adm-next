@@ -46,7 +46,7 @@ export default function EventPageById({ params }: { params: { id: string } }) {
                <button className="btn btn-primary text-base mx-5" onClick={() => router.push(`/event/modify/${params.id}`)}>
                   글 수정
                </button>
-               <button className="btn btn-primary text-base mx-5" onClick={() => router.push('/event/list')}>
+               <button className="btn btn-primary text-base mx-5" onClick={() => router.push(`/event/list/1/${data?.useCheck ? 1 : ''}`)}>
                   이벤트 리스트
                </button>
             </div>
@@ -57,11 +57,15 @@ export default function EventPageById({ params }: { params: { id: string } }) {
                   {data?.useCheck ? '사용함' : '사용안함'}
                </div>
                <h1 className="mb-1 text-2xl font-bold  md:leading-tight md:text-3xl">{data?.title}</h1>
+               <div className="flex max-md:flex-col mt-2 tracking-widest text-gray-400 dark:text-gray-400 text-xs font-medium title-font">
+                  <div>
+                     {data.startDate} ~ {data.endDate}
+                  </div>
+               </div>
 
-               <div className="mb-5 text-base text-gray-500 md:text-lg">수정일: {data?.modifyDate}</div>
+               <div className="mt-5">{HTMLReactParser(data?.content)}</div>
 
-               <div className="prose"></div>
-               {HTMLReactParser(data?.content)}
+               <div className="mt-5 text-base text-right text-gray-500 md:text-lg">수정일: {data?.modifyDate}</div>
             </div>
          ) : (
             <div className="mx-auto">존재하지 않는 게시글입니다.</div>
