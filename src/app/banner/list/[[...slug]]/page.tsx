@@ -2,6 +2,7 @@
 
 import { getBannerList } from '@/app/api/banner/get/getBannerList';
 import Pagination from '@/components/paging/pagination';
+import { S3BannerUrl } from '@/utils/web-initial';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -87,8 +88,9 @@ export default function EventList({ params }: Props) {
                                  width={720}
                                  height={400}
                                  className="h-40 rounded w-full object-cover object-center mb-6"
-                                 src="/img/sample.jpeg"
+                                 src={S3BannerUrl + list.banner}
                                  alt="content"
+                                 priority={true}
                               />
                               <h3 className="tracking-widest text-indigo-500 dark:text-indigo-200 text-xs font-medium title-font">
                                  {list.useCheck ? '사용함' : '사용안함'}
