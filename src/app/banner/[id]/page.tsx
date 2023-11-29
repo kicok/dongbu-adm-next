@@ -1,7 +1,7 @@
 'use client';
 
 import { getBanner } from '@/app/api/banner/get/getBanner';
-import HTMLReactParser from 'html-react-parser';
+import { S3BannerUrl, getPosStr } from '@/utils/web-initial';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
@@ -46,8 +46,8 @@ export default function EventPageById({ params }: { params: { id: string } }) {
                <button className="btn btn-primary text-base mx-5" onClick={() => router.push(`/banner/modify/${params.id}`)}>
                   글 수정
                </button>
-               <button className="btn btn-primary text-base mx-5" onClick={() => router.push('/banner/list')}>
-                  이벤트 리스트
+               <button className="btn btn-primary text-base mx-5" onClick={() => router.push(`/banner/list/1/${data?.useCheck ? 1 : ''}`)}>
+                  배너 리스트
                </button>
             </div>
          </div>
@@ -56,12 +56,21 @@ export default function EventPageById({ params }: { params: { id: string } }) {
                <div className="tracking-widest text-indigo-500 dark:text-indigo-200 text-xs font-medium title-font">
                   {data?.useCheck ? '사용함' : '사용안함'}
                </div>
+
                <h1 className="mb-1 text-2xl font-bold  md:leading-tight md:text-3xl">{data?.title}</h1>
 
-               <div className="mb-5 text-base text-gray-500 md:text-lg">수정일: {data?.modifyDate}</div>
+               <div className="flex max-md:flex-col mt-2 tracking-widest text-gray-400 dark:text-gray-400 text-xs font-medium title-font">
+                  <div className="mr-2">{getPosStr(data.pos)}</div>
+                  <div>
+                     {data.startDate} ~ {data.endDate}
+                  </div>
+               </div>
 
-               <div className="prose"></div>
-               {HTMLReactParser(data?.memo)}
+               <div className="mt-5">{data?.memo}</div>
+               <div className="mt-5">
+                  <img src={S3BannerUrl + data?.banner} alt={data.title} />
+               </div>
+               <div className="mt-5 text-base text-right text-gray-500 md:text-lg">수정일: {data?.modifyDate}</div>
             </div>
          ) : (
             <div className="mx-auto">존재하지 않는 게시글입니다.</div>

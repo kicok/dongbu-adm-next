@@ -14,6 +14,7 @@ type Banner = {
    username: string;
    del: number;
    banner: string;
+   pos: string;
 };
 
 type BannerPageData = {
