@@ -156,14 +156,18 @@ export default function BannerWrite({ contents }: { contents?: Banner }) {
 
    const parentToValue = (val: string) => {
       if (val) {
+         // 파일 브라우져창에서 파일을 선택했을때
          setS3file(val);
 
          // 배너 위치를 분류한다.
          const arr = val.split('/');
          setPos(arr[0]);
       } else {
-         setS3file('');
-         setPos('');
+         // 파일 브라우져창에서 파일선택을 취소했을때
+         if (!contents?.banner) {
+            setS3file('');
+            setPos('');
+         }
       }
    };
 
@@ -192,14 +196,14 @@ export default function BannerWrite({ contents }: { contents?: Banner }) {
 
          <form onSubmit={submitForm}>
             <div>
-               <div className="flex max-md:flex-col mt-[-30px]">
+               <div className="flex max-md:flex-col mt-[-5px]">
                   <div className="w-40"></div>
                   <div className="w-full">
                      <span className="w-full text-red-500 text-sm">{formik.touched.banner && formik.errors.banner}</span>
                   </div>
                </div>
 
-               <div className="flex max-md:flex-col mt-12">
+               <div className="flex max-md:flex-col mt-7">
                   <div className="w-40">위치코드</div>
                   <div className="w-full">
                      <input
