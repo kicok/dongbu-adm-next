@@ -4,7 +4,7 @@ export const makeNewFileName = (fileName: string): string => {
 
    const index = fileName.lastIndexOf('.');
    const replaceStr = `${Date.now()}${Math.floor(Math.random() * (max - min) + min)}.`;
-   const newFName = replaceAt2(fileName, index, replaceStr);
+   const newFName = replaceAt(fileName, index, replaceStr);
 
    return newFName;
 };

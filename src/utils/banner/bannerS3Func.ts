@@ -56,3 +56,25 @@ export const moveBannerS3 = async (sourceFileName: string, newFileName: string) 
       }
    }
 };
+
+// S3 이미지 경로이동 ==> S3 이미지 복제 + 원본 삭제
+export const changeBannerS3 = async (sourceFileName: string, newFileName: string) => {
+   const sArr = bannerSplity(sourceFileName);
+   const nArr = bannerSplity(newFileName);
+
+   // 경로와 상관없이 파일명이 다를때만 실행
+   if (sArr && nArr && sArr[1] !== nArr[1]) {
+      try {
+         const formData = new FormData();
+         formData.append('sourceFileName', sourceFileName);
+         formData.append('newFileName', newFileName);
+
+         // 원본 소스 이미지 삭제
+         deleteBannerS3(sourceFileName);
+      } catch (error) {
+         console.log(error);
+
+         throw new Error('파일을 이동하는데 실패했습니다.');
+      }
+   }
+};

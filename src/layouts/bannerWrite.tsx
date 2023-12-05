@@ -10,8 +10,7 @@ import { useRouter } from 'next/navigation';
 import Toggle from '@/components/toggle';
 import S3BannerUploadForm from '@/components/S3BannerUploadForm';
 import { getPosStr } from '@/utils/web-initial';
-import { signIn } from 'next-auth/react';
-import { moveBannerS3 } from '@/utils/banner/bannerS3Func';
+import { changeBannerS3, moveBannerS3 } from '@/utils/banner/bannerS3Func';
 
 let validationSchema = object({
    title: string().required('제목은 필수 입력 사항입니다.'),
@@ -65,11 +64,13 @@ export default function BannerWrite({ contents }: { contents?: Banner }) {
          console.log(JSON.stringify(values));
 
          try {
-            // 기존의 배너를 다른 위치로 이동시킨다.
+            // 기존의 배너를 다른 위치로 이동시킨다.(이미지와 이미지명은 그대로)
             if (contents?.banner) moveBannerS3(contents.banner, s3file);
+
+            // 기존의 배너를 다른 이미지로 변경한다 (이미지와 이미지 이름이 변경되고 위치변경 있을수 있음)
+            if (contents?.banner) changeBannerS3(contents.banner, s3file);
          } catch (error) {
             console.log('copy~~~ error', JSON.stringify(error));
-            alert('실패했습니다.');
             return;
          }
 
@@ -88,7 +89,7 @@ export default function BannerWrite({ contents }: { contents?: Banner }) {
             if (res.status === 200) {
                router.push('/banner/list/1/1');
             } else {
-               signIn('keycloak');
+               //
             }
          });
       },
@@ -97,7 +98,7 @@ export default function BannerWrite({ contents }: { contents?: Banner }) {
    const submitForm = (e?: React.FormEvent<HTMLFormElement>) => {
       e?.preventDefault();
 
-      // 배너를 등록할때 이미지 s3 업로드 form을 submit 한다. (배너 수정일때는 submit 안함, 현재 로직상 submit 해도 문제는 없지만 하지 않는걸로 분기처리함 )
+      // 배너를 신규등록또는 수정할때 이미지 s3 업로드 form을 submit 한다.
       // if (!contents)
       S3FormRef.current?.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
 
@@ -198,7 +199,7 @@ export default function BannerWrite({ contents }: { contents?: Banner }) {
                   </div>
                </div>
 
-               <div className="flex max-md:flex-col mt-5">
+               <div className="flex max-md:flex-col mt-12">
                   <div className="w-40">위치코드</div>
                   <div className="w-full">
                      <input
@@ -278,7 +279,6 @@ export default function BannerWrite({ contents }: { contents?: Banner }) {
                {dates !== undefined && <input name="startDate" type="hidden" />}
                {dates !== undefined && <input name="endDate" type="hidden" />}
 
-               <span className="w-full text-red-500 text-sm">{formik.touched.memo && formik.errors.memo}</span>
                <div className="flex justify-end">
                   <button type="submit" className="btn btn-third my-10" onClick={getContent}>
                      글 등록

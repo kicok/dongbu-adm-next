@@ -46,11 +46,12 @@ const S3BannerUploadForm = forwardRef(({ parentToValue, imgUrl }: Props, ref: Fo
       }
    };
    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      console.log('dddd');
       if (e.target.files) {
-         const oldFile = e.target.files[0];
+         const sourceFile = e.target.files[0];
 
          // 파일 디렉토리 창에서 파일을 선택도중 취소한 상태
-         if (oldFile === undefined) {
+         if (sourceFile === undefined) {
             setFile(null);
             setPreview('');
             setNewFileName('');
@@ -59,11 +60,13 @@ const S3BannerUploadForm = forwardRef(({ parentToValue, imgUrl }: Props, ref: Fo
             return;
          }
 
-         const newFname = makeNewFileName(oldFile.name);
+         const newFname = makeNewFileName(sourceFile.name);
+
+         console.log('newFname', newFname);
 
          setNewFileName(newFname);
 
-         const newFile = new File([oldFile], newFname); // File생성자를 이용해서 oldFile의 이름을 newFName 으로 변경
+         const newFile = new File([sourceFile], newFname); // File생성자를 이용해서 oldFile의 이름을 newFName 으로 변경
 
          setFile(newFile);
 
@@ -118,29 +121,30 @@ const S3BannerUploadForm = forwardRef(({ parentToValue, imgUrl }: Props, ref: Fo
             <RadioBtn arr={bannerPositionObj} defaultCheckPos={defaultCheckPos} radioChange={radioChange} />
 
             <div className="mt-5">
-               <div className="flex max-md:flex-col mt-5">
-                  {(preview || imgUrl) && (
-                     <>
-                        <div className="w-40">이미지</div>
-                        <div className="relative h-[200px] min-w-[200px]">
-                           {preview && <Image alt="preview" src={preview} objectFit="contain" objectPosition="center" priority layout="fill" />}
-
-                           {imgUrl && (
-                              <Image alt="preview" src={S3BannerUrl + imgUrl} objectFit="contain" objectPosition="center" priority layout="fill" />
-                           )}
-                        </div>
-                     </>
-                  )}
-               </div>
+               {imgUrl && (
+                  <div className="flex max-md:flex-col mt-5">
+                     <div className="w-40">{preview && <span>현재 </span>}이미지</div>
+                     <div className="relative h-[200px] min-w-[200px]">
+                        <Image alt="preview" src={S3BannerUrl + imgUrl} objectFit="contain" objectPosition="center" priority layout="fill" />
+                     </div>
+                  </div>
+               )}
+               {preview && (
+                  <div className="flex max-md:flex-col mt-5">
+                     <div className="w-40">{imgUrl && <span>변경될 </span>}이미지</div>
+                     <div className="relative h-[200px] min-w-[200px]">
+                        <Image alt="preview" src={preview} objectFit="contain" objectPosition="center" priority layout="fill" />
+                     </div>
+                  </div>
+               )}
             </div>
             <div className="flex max-md:flex-col mt-5">
                <div className="w-40">업로드 파일</div>
                <div className="w-full">
                   <input type="file" accept="image/*" onChange={handleFileChange} className="max-w-lg" />
+                  <span className="ml-2">{uploading ? 'uploading...' : ''}</span>
                </div>
             </div>
-
-            <button type="submit">{uploading ? 'uploading...' : ''}</button>
          </form>
       </div>
    );
