@@ -10,6 +10,8 @@ import { useRouter } from 'next/navigation';
 import Toggle from '@/components/toggle';
 import S3BannerUploadForm from '@/components/S3BannerUploadForm';
 import { getPosStr } from '@/utils/web-initial';
+import { signIn } from 'next-auth/react';
+import { moveBannerS3 } from '@/utils/banner/bannerS3Func';
 
 let validationSchema = object({
    title: string().required('제목은 필수 입력 사항입니다.'),
@@ -54,18 +56,22 @@ export default function BannerWrite({ contents }: { contents?: Banner }) {
       },
 
       validationSchema: validationSchema,
-
-      // 값 변경시마다 validation 체크
-      validateOnChange: true,
-
-      // 인풋창 블러시에 validation 체크
-      validateOnBlur: true,
-
+      validateOnChange: true, // 값 변경시마다 validation 체크
+      validateOnBlur: true, // 인풋창 블러시에 validation 체크
       // validation 체크할 함수
       //  validate: validator
 
       onSubmit: async (values) => {
          console.log(JSON.stringify(values));
+
+         try {
+            // 기존의 배너를 다른 위치로 이동시킨다.
+            if (contents?.banner) moveBannerS3(contents.banner, s3file);
+         } catch (error) {
+            console.log('copy~~~ error', JSON.stringify(error));
+            alert('실패했습니다.');
+            return;
+         }
 
          const options = {
             method: contents ? 'PUT' : 'POST',
@@ -81,6 +87,8 @@ export default function BannerWrite({ contents }: { contents?: Banner }) {
          const data = await fetch(url, options).then((res) => {
             if (res.status === 200) {
                router.push('/banner/list/1/1');
+            } else {
+               signIn('keycloak');
             }
          });
       },
@@ -90,7 +98,8 @@ export default function BannerWrite({ contents }: { contents?: Banner }) {
       e?.preventDefault();
 
       // 배너를 등록할때 이미지 s3 업로드 form을 submit 한다. (배너 수정일때는 submit 안함, 현재 로직상 submit 해도 문제는 없지만 하지 않는걸로 분기처리함 )
-      if (!contents) S3FormRef.current?.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+      // if (!contents)
+      S3FormRef.current?.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
 
       // useCheck 값을 가져온다.
       getContent();
@@ -177,7 +186,7 @@ export default function BannerWrite({ contents }: { contents?: Banner }) {
          <S3BannerUploadForm
             ref={S3FormRef}
             parentToValue={parentToValue}
-            imgUrl={contents && formik.values.banner} // contents 가 있을때만 imgUrl을 전송한다.
+            imgUrl={contents && contents.banner} // contents 가 있을때만 imgUrl을 전송한다.
          />
 
          <form onSubmit={submitForm}>
@@ -197,7 +206,7 @@ export default function BannerWrite({ contents }: { contents?: Banner }) {
                         id="pos"
                         name="pos"
                         placeholder="배너위치 코드"
-                        value={formik.values.pos}
+                        value={pos}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                         readOnly={true}

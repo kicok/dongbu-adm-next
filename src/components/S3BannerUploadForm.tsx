@@ -2,9 +2,9 @@
 
 import { ForwardedRef, forwardRef, useEffect, useState } from 'react';
 import RadioBtn from './radioBtn';
-import replaceAt from '@/utils/replaceAt';
 import { S3BannerUrl, bannerPositionObj } from '@/utils/web-initial';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
+import { makeNewFileName } from '@/utils/func';
 
 type Props = {
    parentToValue: (val: string) => void;
@@ -13,7 +13,8 @@ type Props = {
 
 const S3BannerUploadForm = forwardRef(({ parentToValue, imgUrl }: Props, ref: ForwardedRef<HTMLFormElement>) => {
    const [file, setFile] = useState<File | null>();
-   const [position, setPosition] = useState<string>('carousel');
+   const [position, setPosition] = useState<string>('carousel'); // 라디오 버튼 선택시 위치 값 (radioChange와 연동)
+   const [defaultCheckPos, setDefaultCheckPos] = useState<string | null>(null); // 글수정할때 라디오 버튼 디비 저장값 전달
    const [preview, setPreview] = useState<string | null>('');
    const [uploading, setUploading] = useState(false);
    const [newFileName, setNewFileName] = useState('');
@@ -48,6 +49,7 @@ const S3BannerUploadForm = forwardRef(({ parentToValue, imgUrl }: Props, ref: Fo
       if (e.target.files) {
          const oldFile = e.target.files[0];
 
+         // 파일 디렉토리 창에서 파일을 선택도중 취소한 상태
          if (oldFile === undefined) {
             setFile(null);
             setPreview('');
@@ -57,22 +59,15 @@ const S3BannerUploadForm = forwardRef(({ parentToValue, imgUrl }: Props, ref: Fo
             return;
          }
 
-         let fileName = oldFile.name;
+         const newFname = makeNewFileName(oldFile.name);
 
-         const max = 99999999999;
-         const min = 1;
+         setNewFileName(newFname);
 
-         const index = fileName.lastIndexOf('.');
-         const replaceStr = `-${Date.now()}${Math.floor(Math.random() * (max - min) + min)}.`;
-         const newFName = replaceAt(fileName, index, replaceStr);
-
-         setNewFileName(newFName);
-
-         const newFile = new File([oldFile], newFName); // File생성자를 이용해서 oldFile의 이름을 newFName 으로 변경
+         const newFile = new File([oldFile], newFname); // File생성자를 이용해서 oldFile의 이름을 newFName 으로 변경
 
          setFile(newFile);
 
-         parentToValue(position + '/' + newFName);
+         parentToValue(position + '/' + newFname);
       } else {
          parentToValue('');
       }
@@ -80,6 +75,7 @@ const S3BannerUploadForm = forwardRef(({ parentToValue, imgUrl }: Props, ref: Fo
 
    useEffect(() => {
       if (file) {
+         // 새글 작성시 업로드할 이미지 미리보기
          const reader = new FileReader();
          reader.onloadend = () => {
             setPreview(reader.result as string);
@@ -96,33 +92,53 @@ const S3BannerUploadForm = forwardRef(({ parentToValue, imgUrl }: Props, ref: Fo
 
    useEffect(() => {
       // 부모에게 s3에 업로드된 디렉토리경로와 파일명을 전달한다.
-      if (file) parentToValue(position + '/' + newFileName);
-      else parentToValue('');
-   }, [position, newFileName, parentToValue, file]);
+
+      if (file) {
+         // 이미지 파일 신규 등록
+         parentToValue(position + '/' + newFileName);
+      } else if (imgUrl) {
+         // 기존 이미지 파일을 다른 위치로 이동할때(다른위치로 카피 이후 원래 위치의 파일은 삭제)
+         // 파일명은 그대로 유지한채 폴더위치만 바꾼다.
+         parentToValue(position + '/' + imgUrl.split('/')[1]);
+      } else {
+         parentToValue('');
+      }
+   }, [position, newFileName, parentToValue, file, imgUrl]);
+
+   useEffect(() => {
+      if (imgUrl) {
+         setPosition(imgUrl.split('/')[0]);
+         setDefaultCheckPos(imgUrl.split('/')[0]);
+      }
+   }, [imgUrl]);
 
    return (
       <div className="mt-10">
          <form onSubmit={handleSubmit} ref={ref}>
-            {!imgUrl && <RadioBtn arr={bannerPositionObj} checkedPos="carousel" radioChange={radioChange} />}
+            <RadioBtn arr={bannerPositionObj} defaultCheckPos={defaultCheckPos} radioChange={radioChange} />
 
             <div className="mt-5">
                <div className="flex max-md:flex-col mt-5">
-                  {(preview || imgUrl) && <div className="w-40">이미지</div>}
-                  <div className="w-full">
-                     {preview && <Image alt="preview" src={preview} width={230} height={230} />}
+                  {(preview || imgUrl) && (
+                     <>
+                        <div className="w-40">이미지</div>
+                        <div className="relative h-[200px] min-w-[200px]">
+                           {preview && <Image alt="preview" src={preview} objectFit="contain" objectPosition="center" priority layout="fill" />}
 
-                     {imgUrl && <Image alt="preview" src={S3BannerUrl + imgUrl} width={230} height={230} />}
-                  </div>
+                           {imgUrl && (
+                              <Image alt="preview" src={S3BannerUrl + imgUrl} objectFit="contain" objectPosition="center" priority layout="fill" />
+                           )}
+                        </div>
+                     </>
+                  )}
                </div>
             </div>
-            {!imgUrl && (
-               <div className="flex max-md:flex-col mt-5">
-                  <div className="w-40">업로드 파일</div>
-                  <div className="w-full">
-                     <input type="file" accept="image/*" onChange={handleFileChange} className="max-w-lg" />
-                  </div>
+            <div className="flex max-md:flex-col mt-5">
+               <div className="w-40">업로드 파일</div>
+               <div className="w-full">
+                  <input type="file" accept="image/*" onChange={handleFileChange} className="max-w-lg" />
                </div>
-            )}
+            </div>
 
             <button type="submit">{uploading ? 'uploading...' : ''}</button>
          </form>
