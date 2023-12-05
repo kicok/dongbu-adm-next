@@ -3,7 +3,7 @@ import { getBaseUrl } from '@/utils/getBaseUrl';
 export const getBanner = async (id: string) => {
    const response = await fetch(`${getBaseUrl()}/api/banner/get?id=${id}`, {
       next: {
-         revalidate: 300, // second
+         revalidate: 0, // second
       },
    });
 

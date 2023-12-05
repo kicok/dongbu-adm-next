@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
          // console.log('url:: ', url);
 
          const response = await fetch(url, {
+            next: { revalidate: 0 },
             method: 'GET',
             headers: {
                'Content-Type': 'application/json',
