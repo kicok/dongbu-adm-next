@@ -65,7 +65,9 @@ export default function BannerPageById({ params }: { params: { id: string } }) {
                <h1 className="mb-1 text-2xl font-bold  md:leading-tight md:text-3xl">{data?.title}</h1>
 
                <div className="flex max-md:flex-col mt-2 tracking-widest text-gray-400 dark:text-gray-400 text-xs font-medium title-font">
-                  <div className="mr-2">{getPosStr(data.pos)}</div>
+                  <div className="mr-2">
+                     {getPosStr(data.pos)} ({data.pos})
+                  </div>
                   <div>
                      {data.startDate} ~ {data.endDate}
                   </div>

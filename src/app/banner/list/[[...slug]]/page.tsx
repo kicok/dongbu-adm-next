@@ -2,7 +2,7 @@
 
 import { getBannerList } from '@/app/api/banner/get/getBannerList';
 import Pagination from '@/components/paging/pagination';
-import { S3BannerUrl } from '@/utils/web-initial';
+import { S3BannerUrl, getPosStr } from '@/utils/web-initial';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -98,6 +98,7 @@ export default function EventList({ params }: Props) {
                               <h2 className="text-lg text-gray-900 font-medium title-font mb-4">{list.title}</h2>
                               <p className="truncate leading-relaxed text-base dark:text-white">{tagRemove(list.memo)}</p>
                               <div className=" p-2 text-sm text-gray-400 text-end">
+                                 <div>위치 : {getPosStr(list.pos)} </div>
                                  <div>시작일 : {list.startDate} </div>
                                  <div>종료일 : {list.endDate} </div>
                                  <div>작성일 : {list.createdDate} </div>
