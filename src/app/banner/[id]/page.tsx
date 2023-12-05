@@ -1,11 +1,12 @@
 'use client';
 
 import { getBanner } from '@/app/api/banner/get/getBanner';
+import { deleteBannerS3 } from '@/utils/banner/bannerS3Func';
 import { S3BannerUrl, getPosStr } from '@/utils/web-initial';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
-export default function EventPageById({ params }: { params: { id: string } }) {
+export default function BannerPageById({ params }: { params: { id: string } }) {
    const router = useRouter();
    const [data, setData] = useState<Banner>();
    useEffect(() => {
@@ -19,23 +20,8 @@ export default function EventPageById({ params }: { params: { id: string } }) {
 
    const deleteCheck = async () => {
       if (confirm('글을 정말 삭제하시겠습니까?')) {
-         try {
-            // S3 이미지 삭제
-            const arr = data!.banner.split('/');
-            const formData = new FormData();
-            formData.append('pos', arr[0]);
-            formData.append('fileName', data?.banner as string);
-
-            console.log('formData::', formData.get('fileName'));
-            const s3delRes = await fetch('/api/banner-s3/del', {
-               method: 'POST',
-               body: formData,
-            });
-
-            const result = await s3delRes.json();
-         } catch (error) {
-            console.log(error);
-         }
+         // s3 서버 배너삭제
+         deleteBannerS3(data?.banner as string);
 
          // 게시글 삭제(컬럼을 삭제상태로 변경)
          const options = {
