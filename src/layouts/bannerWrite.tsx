@@ -87,6 +87,8 @@ export default function BannerWrite({ contents }: { contents?: Banner }) {
          const url = contents ? '/api/banner/put' : '/api/banner/';
          const data = await fetch(url, options).then((res) => {
             if (res.status === 200) {
+               // 원글을 먼저 등록 또는 수정 이후 이미지 s3 업로드 form을 submit 한다.(원글등록전에 이미지가 업로드 되는걸 방지)
+               S3FormRef.current?.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
                router.push('/banner/list/1/1');
             } else {
                //
@@ -97,10 +99,6 @@ export default function BannerWrite({ contents }: { contents?: Banner }) {
 
    const submitForm = (e?: React.FormEvent<HTMLFormElement>) => {
       e?.preventDefault();
-
-      // 배너를 신규등록또는 수정할때 이미지 s3 업로드 form을 submit 한다.
-      // if (!contents)
-      S3FormRef.current?.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
 
       // useCheck 값을 가져온다.
       getContent();
@@ -203,30 +201,34 @@ export default function BannerWrite({ contents }: { contents?: Banner }) {
                   </div>
                </div>
 
-               <div className="flex max-md:flex-col mt-7">
-                  <div className="w-40">위치코드</div>
-                  <div className="w-full">
-                     <input
-                        className="w-24"
-                        id="pos"
-                        name="pos"
-                        placeholder="배너위치 코드"
-                        value={pos}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        readOnly={true}
-                     />
-                     <span className="ml-2 text-sm">
-                        {!contents?.pos || formik.values.pos === contents?.pos ? (
-                           getPosStr(formik.values.pos)
-                        ) : (
-                           <span className="text-red-500">
-                              {getPosStr(contents!.pos)} ⇒ {getPosStr(formik.values.pos)}
-                           </span>
-                        )}
-                     </span>
+               {formik.values.pos && (
+                  <div className="flex max-md:flex-col mt-7">
+                     <div className="w-40">배너 위치</div>
+                     <div className="w-full">
+                        <input
+                           className="w-24"
+                           id="pos"
+                           name="pos"
+                           placeholder="배너위치 코드"
+                           value={pos}
+                           onChange={formik.handleChange}
+                           onBlur={formik.handleBlur}
+                           readOnly={true}
+                           hidden
+                        />
+                        <span className="ml-2 text-sm">
+                           {!contents?.pos || formik.values.pos === contents?.pos ? (
+                              getPosStr(formik.values.pos)
+                           ) : (
+                              <>
+                                 <span>{getPosStr(contents!.pos)}</span>
+                                 <span className="text-red-500"> ⇒ {getPosStr(formik.values.pos)}</span>
+                              </>
+                           )}
+                        </span>
+                     </div>
                   </div>
-               </div>
+               )}
                <div className="flex max-md:flex-col mt-5">
                   <div className="w-40">배 너</div>
                   <div className="w-full">
