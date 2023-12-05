@@ -207,7 +207,7 @@ export default function BannerWrite({ contents }: { contents?: Banner }) {
                   <div className="w-40">위치코드</div>
                   <div className="w-full">
                      <input
-                        className="w-auto"
+                        className="w-24"
                         id="pos"
                         name="pos"
                         placeholder="배너위치 코드"
@@ -216,7 +216,15 @@ export default function BannerWrite({ contents }: { contents?: Banner }) {
                         onBlur={formik.handleBlur}
                         readOnly={true}
                      />
-                     <span className="ml-2">{getPosStr(formik.values.pos)}</span>
+                     <span className="ml-2 text-sm">
+                        {!contents?.pos || formik.values.pos === contents?.pos ? (
+                           getPosStr(formik.values.pos)
+                        ) : (
+                           <span className="text-red-500">
+                              {getPosStr(contents!.pos)} ⇒ {getPosStr(formik.values.pos)}
+                           </span>
+                        )}
+                     </span>
                   </div>
                </div>
                <div className="flex max-md:flex-col mt-5">
@@ -253,7 +261,7 @@ export default function BannerWrite({ contents }: { contents?: Banner }) {
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                      />
-                     <span className="w-full text-red-500 text-sm">{formik.touched.title && formik.errors.title}</span>
+                     <span className="w-full text-red-500 text-xs">{formik.touched.title && formik.errors.title}</span>
                   </div>
                </div>
 
