@@ -57,7 +57,7 @@ export const moveBannerS3 = async (sourceFileName: string, newFileName: string) 
    }
 };
 
-// S3 이미지 경로이동 ==> S3 이미지 복제 + 원본 삭제
+// S3 이미지 변경 ==> S3 이미지 신규등록(S3BannerUploadForm에서 이미 등록됨) + 원본 삭제
 export const changeBannerS3 = async (sourceFileName: string, newFileName: string) => {
    const sArr = bannerSplity(sourceFileName);
    const nArr = bannerSplity(newFileName);
@@ -74,7 +74,7 @@ export const changeBannerS3 = async (sourceFileName: string, newFileName: string
       } catch (error) {
          console.log(error);
 
-         throw new Error('파일을 이동하는데 실패했습니다.');
+         throw new Error('원본 파일을 삭제하는데 실패했습니다.');
       }
    }
 };
