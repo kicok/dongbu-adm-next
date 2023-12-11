@@ -1,23 +1,32 @@
-import React, { useRef, useEffect, forwardRef, useImperativeHandle, useState } from 'react';
-// import AWS from 'aws-sdk';
-import SunEditor from 'suneditor-react';
-import SunEditorCore from 'suneditor/src/lib/core';
+'use client';
+import React, { useRef, useEffect, forwardRef, useImperativeHandle, useState, useCallback, useMemo } from 'react';
+import dynamic from 'next/dynamic';
+// import SunEditor from 'suneditor-react';
+import SunEditorCore, { fileInfo } from 'suneditor/src/lib/core';
 import 'suneditor/dist/css/suneditor.min.css'; // Import Sun Editor's CSS File
-import { UploadBeforeHandler } from 'suneditor-react/dist/types/upload';
+import { UploadBeforeHandler, UploadInfo } from 'suneditor-react/dist/types/upload';
+import { makeNewFileName, makeRandomStr } from '@/utils/func';
+import { S3Url } from '@/utils/web-initial';
 
-const REGION = process.env.REACT_APP_AWS_S3_BUCKET_REGION;
-const ACCESS_KEY = process.env.REACT_APP_AWS_S3_BUCKET_ACCESS_KEY_ID;
-const SECRET_ACCESS_KEY = process.env.REACT_APP_AWS_S3_BUCKET_SECRET_ACCESS_KEY;
-const CLOUD_FRONT_URL = ''; //배포한 CloudFront URI;
+const SunEditor = dynamic(() => import('suneditor-react'), {
+   ssr: false,
+});
 
 export type SunEditorCustomType = {
    SunEditorCustomGetValue: () => string;
+   SunEditorCustomGetImgPos: () => string;
 };
 
-const SunEditorCustom = forwardRef<SunEditorCustomType, { dbContent: string }>((props, ref) => {
-   const editor = useRef<SunEditorCore>();
+type Props = {
+   dirName: string; // s3서버에 이미지 업로드시 사용할 게시판 고유 디렉토리 명
+   pos?: string; // s3서버에 이미지 업로드시 사용할 게시글 각각의 고유 디렉토리 명 dirName/pos/img.png
+   dbContent?: string;
+};
 
+const SunEditorCustom = forwardRef<SunEditorCustomType, Props>((props, ref) => {
+   const editor = useRef<SunEditorCore>();
    const [value, setValue] = useState('');
+   const [imgPos, setImpPos] = useState(makeRandomStr(10)); // 새글 작성시 생성
 
    // The sunEditor parameter will be set to the core suneditor instance when this function is called
    const getSunEditorInstance = (sunEditor: SunEditorCore) => {
@@ -30,136 +39,89 @@ const SunEditorCustom = forwardRef<SunEditorCustomType, { dbContent: string }>((
 
    useImperativeHandle(ref, () => ({
       SunEditorCustomGetValue,
+      SunEditorCustomGetImgPos,
    }));
 
+   useEffect(() => {
+      if (props.pos) {
+         setImpPos(props.pos); // 디비에서 가져온 경로
+      }
+   }, [props.pos, imgPos]);
+
    const SunEditorCustomGetValue = () => value;
+   const SunEditorCustomGetImgPos = () => imgPos;
 
-   const imageHandler = async (uploadBeforeHandler: UploadBeforeHandler) => {
-      console.log('uploadBeforeHandler', uploadBeforeHandler);
+   const getPos = () => {
+      // 외부에서 props.pos 가 전달되면 그 값으로 setImpPos 를 실행한다.
+      if (props.pos && imgPos !== props.pos) setImpPos(props.pos);
+   };
 
-      console.log('asdasdgasda');
-      const input = document.createElement('input');
-      input.setAttribute('type', 'file');
-      input.setAttribute('accept', 'image/*');
-      input.click();
-      input.addEventListener('change', async () => {
-         //이미지를 담아 전송할 file을 만든다
-         const file = input.files?.[0];
-         // try {
-         //    //업로드할 파일의 이름으로 Date 사용
-         //    const name = Date.now();
-         //    //생성한 s3 관련 설정들
-         //    AWS.config.update({
-         //       region: REGION,
-         //       accessKeyId: ACCESS_KEY,
-         //       secretAccessKey: SECRET_ACCESS_KEY,
-         //    });
-         //    //앞서 생성한 file을 담아 s3에 업로드하는 객체를 만든다
-         //    const upload = new AWS.S3.ManagedUpload({
-         //       params: {
-         //          ACL: 'public-read',
-         //          Bucket: 'itsmovietime', //버킷 이름
-         //          Key: `upload/${name}`,
-         //          Body: file,
-         //       },
-         //    });
-         //    //이미지 업로드 후
-         //    //곧바로 업로드 된 이미지 url을 가져오기
-         //    const IMG_URL = await upload.promise().then((res) => res.Location);
-         //    //useRef를 사용해 에디터에 접근한 후
-         //    //에디터의 현재 커서 위치에 이미지 삽입
+   getPos(); // 외부에서 props.pos값이 통신 상태에 따라 늦게 전달되므로 값을 계속 전달 받기위해 함수를 실행
 
-         //    const html = `<img src="${IMG_URL}" title="${name}" />`;
-         //    // editor.current?.insertHTML(html);
+   const imgFormUpload = async (formData: FormData) => {
+      console.log('formData', formData.get('file'));
+      const response = await fetch('/api/wysiwyg-s3', {
+         method: 'POST',
+         body: formData,
+      });
 
-         //    // const editor = editor
-         //    // const range = editor.getSelection();
-         //    // 가져온 위치에 이미지를 삽입한다
-         //    // editor.insertEmbed(range!.index, 'image', IMG_URL);
-         // } catch (error) {
-         //    console.log(error);
-         // }
+      if (response.status === 200) return await response.json();
+      else '';
+   };
+
+   const imageHandler = (
+      targetImgElement: HTMLImageElement,
+      index: number,
+      state: 'create' | 'update' | 'delete',
+      imageInfo: UploadInfo<HTMLImageElement>,
+      remainingFilesCount: number
+   ) => {
+      console.log('targetImgElement', targetImgElement);
+      console.log('index', index);
+      console.log('state', state);
+      console.log('imageInfo', imageInfo);
+      console.log('remainingFilesCount', remainingFilesCount);
+
+      // console.log('imgArr.length ', imgArr.length);
+      if (state === 'delete') {
+         console.log('delete imageInfo src::::', imageInfo);
+         console.log('delete targetImgElement src::::', targetImgElement);
+         console.log('delete index src::::', index);
+      }
+
+      // return;
+   };
+
+   const uploadingImg = async (files: Array<File>) => {
+      const imgObjArr = await Promise.all(
+         files.map((file, k) => {
+            const formData = new FormData();
+            const newFileName = makeNewFileName(file['name']);
+
+            formData.append('file', file, newFileName);
+            formData.append('position', props.dirName + '/' + imgPos);
+
+            return imgFormUpload(formData);
+         })
+      );
+
+      imgObjArr.forEach((imgInfo) => {
+         if (imgInfo.success) {
+            editor.current?.insertHTML(`<img src="${S3Url}${imgInfo.fileName}"/>`, true, true);
+         }
       });
    };
 
    const handleImageUploadBefore = (files: Array<File>, info: object, uploadHandler: UploadBeforeHandler) => {
-      // uploadHandler is a function
-      console.log('-------------files', files);
-      console.log('-------------info', info);
+      uploadingImg(files);
 
-      const formData = new FormData();
-      files.map((file, k) => {
-         console.log('file', file['name']);
-         formData.append(`files`, file, file['name']);
-      });
-      console.log('-----------------formData', formData);
-      console.log('formData.values', formData.values.length);
+      return false;
+      // 업로드시 반드시 flase 로 리턴 해야 onImageUpload 에 해당되는 함수가 실행되지 않는다.
+      // 업로드시 onImageUpload 함수가 실행되면 suneditor 버그가 있어서 한번에 여러개의 파일 업로드가 되지 않음
+      // 그러므로 현재 코딩 상태에서는 반드시 flase 를 리턴해야 함
 
-      // const input = document.createElement('input');
-      // input.setAttribute('type', 'file');
-      // input.setAttribute('accept', 'image/*');
-      // input.click();
-      // input.addEventListener('change', async () => {
-      //이미지를 담아 전송할 file을 만든다
-
-      // try {
-      //    //업로드할 파일의 이름으로 Date 사용
-      //    const name = Date.now();
-      //    //생성한 s3 관련 설정들
-      //    AWS.config.update({
-      //       region: REGION,
-      //       accessKeyId: ACCESS_KEY,
-      //       secretAccessKey: SECRET_ACCESS_KEY,
-      //    });
-      //    //앞서 생성한 file을 담아 s3에 업로드하는 객체를 만든다
-      //    const upload = new AWS.S3.ManagedUpload({
-      //       params: {
-      //          ACL: 'public-read',
-      //          Bucket: 'itsmovietime', //버킷 이름
-      //          Key: `upload/${name}`,
-      //          Body: formData,
-      //       },
-      //    });
-      //    //이미지 업로드 후
-      //    //곧바로 업로드 된 이미지 url을 가져오기
-      //    console.log('upload', upload);
-      //    const IMG_URL = upload.promise().then((res) => res.Location);
-      //    //useRef를 사용해 에디터에 접근한 후
-      //    //에디터의 현재 커서 위치에 이미지 삽입
-
-      //    const html = `<img src="${IMG_URL}" title="${name}" />`;
-      //    // editor.current?.insertHTML(html);
-
-      //    // const editor = editor
-      //    // const range = editor.getSelection();
-      //    // 가져온 위치에 이미지를 삽입한다
-      //    // editor.insertEmbed(range!.index, 'image', IMG_URL);
-      // } catch (error) {
-      //    console.log(error);
-      // }
-      // });
-
-      async () => {
-         // const { data } = await axios.post('http://localhost:1000/api/v1/upload/single', formData);
-         // const res = {
-         //    result: [
-         //       {
-         //          url: data?.url,
-         //          name: 'thumbnail',
-         //       },
-         //    ],
-         // };
-         // uploadHandler(files);
-      };
-      return true;
+      // return값에 관계없이 수정페이지에서 이미지 태그가 있을때 처음 로딩시 onImageUpload 는 자동실행되므로 status값에 따라 처리 가능
    };
-
-   const handleImageUploadBefore2 = (files: Array<File>, info: object, uploadHandler: UploadBeforeHandler) => {
-      async () => {};
-      return true;
-   };
-
-   // const handleImageUploadBefore = (files: Array<File>, info: object, uploadHandler: UploadBeforeHandler) => {
 
    const buttonList = [
       // default
@@ -187,8 +149,7 @@ const SunEditorCustom = forwardRef<SunEditorCustomType, { dbContent: string }>((
             setOptions={{
                buttonList: buttonList,
             }}
-            // onImageUpload={imageHandler}
-
+            onImageUpload={imageHandler}
             onImageUploadBefore={handleImageUploadBefore}
          />
       </div>

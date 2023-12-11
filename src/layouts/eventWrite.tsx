@@ -1,9 +1,9 @@
 'use client';
 
-import { Field, useFormik } from 'formik';
+import { useFormik } from 'formik';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { object, string, number, date, InferType } from 'yup';
+import { object, string } from 'yup';
 import dayjs from 'dayjs';
 import ReactMultiDatepicker from '@/components/calendars/multiDatepicker/ReactMultiDatepicker';
 import SunEditorCustom, { SunEditorCustomType } from '@/components/editor/sunEditor/SunEditorCustom';
@@ -20,6 +20,7 @@ export default function EventWrite({ event }: { event?: EventPopup }) {
    const SunEditRef = useRef<SunEditorCustomType>(null);
    const [useCheck, setUseCheck] = useState<boolean>(true);
    const [useCheckMsg, setUseCheckMsg] = useState<string>('사용함');
+   const [pos, setPos] = useState<string>('');
 
    const [content, setContent] = useState<string>('');
 
@@ -30,22 +31,13 @@ export default function EventWrite({ event }: { event?: EventPopup }) {
       setDates(value);
    };
 
-   useEffect(() => {
-      // 새글작성시 디폴트 이벤트 기간 설정
-      if (!event) {
-         const today = dayjs();
-         const todayStr = today.add(0, 'day').format('YYYY-MM-DD');
-         const tomorrowStr = today.add(2, 'day').format('YYYY-MM-DD');
-         setDates([todayStr, tomorrowStr]);
-      }
-   }, [event]);
-
    const formik = useFormik({
       initialValues: {
          title: '',
          startDate: '',
          endDate: '',
          content: '',
+         pos: '',
       },
 
       validationSchema: validationSchema,
@@ -94,12 +86,27 @@ export default function EventWrite({ event }: { event?: EventPopup }) {
       formik.handleSubmit();
    };
 
+   useEffect(() => {
+      // 새글작성시 디폴트 이벤트 기간 설정
+      if (!event) {
+         const today = dayjs();
+         const todayStr = today.add(0, 'day').format('YYYY-MM-DD');
+         const tomorrowStr = today.add(2, 'day').format('YYYY-MM-DD');
+         setDates([todayStr, tomorrowStr]);
+
+         const imgPos = SunEditRef.current?.SunEditorCustomGetImgPos();
+         setPos(imgPos ?? 'tmp');
+      }
+   }, [event]);
+
    // DB에서 호출해온 이벤트 데이터 초기 셋팅
    // 글 수정할때 페이지 로딩시 데이터 초기화
    useEffect(() => {
       if (event) {
          formik.setFieldValue('id', event.id); // 글 수정시에 필요한 id (uuid)
          formik.setFieldValue('title', event.title);
+         formik.setFieldValue('pos', event.pos);
+         setPos(event.pos);
          setContent(event.content);
          setDates([event.startDate, event.endDate]);
          setUseCheck(event.useCheck);
@@ -120,6 +127,7 @@ export default function EventWrite({ event }: { event?: EventPopup }) {
 
       formik.setFieldValue('content', val);
       formik.setFieldValue('useCheck', useCheck);
+      formik.setFieldValue('pos', pos);
    };
 
    useEffect(() => {
@@ -129,6 +137,9 @@ export default function EventWrite({ event }: { event?: EventPopup }) {
    const handleToggle = () => {
       setUseCheck((check) => !check);
    };
+
+   const dirName = 'events';
+
    return (
       <div>
          <div className="flex justify-end">
@@ -138,6 +149,17 @@ export default function EventWrite({ event }: { event?: EventPopup }) {
          </div>
 
          <form onSubmit={submitForm} className="my-20">
+            <input
+               type="text"
+               className="w-full"
+               id="pos"
+               name="pos"
+               placeholder="dd"
+               value={pos}
+               onChange={formik.handleChange}
+               onBlur={formik.handleBlur}
+            />
+            <span className="w-full text-red-500 text-sm">{formik.touched.pos && formik.errors.pos}</span>
             <div>
                <div className="flex max-md:flex-col">
                   <div className="w-40">사용 여부</div>
@@ -171,7 +193,8 @@ export default function EventWrite({ event }: { event?: EventPopup }) {
                {dates !== undefined && <input name="endDate" type="hidden" />}
                <input name="content" type="hidden" />
 
-               <SunEditorCustom ref={SunEditRef} dbContent={content} />
+               {event && event?.pos.length > 0 && <SunEditorCustom ref={SunEditRef} dbContent={content} pos={event?.pos} dirName={dirName} />}
+               {!event && <SunEditorCustom ref={SunEditRef} dirName={dirName} />}
                <span className="w-full text-red-500 text-sm">{formik.touched.content && formik.errors.content}</span>
                <div className="flex justify-end">
                   <button type="submit" className="btn btn-third my-10" onClick={getContent}>
