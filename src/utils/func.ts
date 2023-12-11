@@ -28,3 +28,15 @@ export const replaceAt2 = (str: string, index: number, replacement: string) => {
 
    return str.substring(0, index) + '-' + replacement + str.substring(index + 1); // str + replacement + 확장자
 };
+
+// 랜덤문자열
+export const makeRandomStr = (num: number): string => {
+   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+   let result = '';
+   const charsLength = chars.length;
+   for (let i = 0; i < num; i++) {
+      result += chars.charAt(Math.floor(Math.random() * charsLength));
+   }
+
+   return result;
+};
