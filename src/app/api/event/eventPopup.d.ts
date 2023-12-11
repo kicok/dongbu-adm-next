@@ -13,6 +13,7 @@ type EventPopup = {
    title: string;
    username: string;
    del: number;
+   pos: string;
 };
 
 type PageSort = {
