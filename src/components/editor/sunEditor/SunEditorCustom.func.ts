@@ -28,8 +28,8 @@ export const listObjectsV2 = async (dirName: string) => {
    else '';
 };
 
-// S3 이미지 삭제
-export const deleteEditorS3 = async (filePathName: string) => {
+// S3 이미지 1개 파일삭제 (isOne true 이면 개별 파일 삭제)
+export const deleteS3 = async (filePathName: string, isOne = true) => {
    if (!filePathName) return;
 
    filePathName = filePathName.replace(S3Url, '');
@@ -39,7 +39,10 @@ export const deleteEditorS3 = async (filePathName: string) => {
       const formData = new FormData();
       formData.append('filePathName', filePathName);
 
-      const s3delRes = await fetch('/api/wysiwyg-s3/deleteObject', {
+      let url;
+      if (isOne) url = '/api/wysiwyg-s3/deleteOne'; // 해당 파일 1개만 삭제
+      else url = '/api/wysiwyg-s3/deleteObjects'; // 해당 폴더의 모든 파일 삭제
+      const s3delRes = await fetch(url, {
          method: 'POST',
          body: formData,
       });
@@ -54,12 +57,14 @@ export const deleteEditorS3 = async (filePathName: string) => {
 // s3 이미지 폴더 삭제 => 특정 폴더내의 모든 이미지리스트 삭제
 // 폴더내의 다른 폴더는 고려하지 않았기 때문에 폴더내에 포함된 다른 폴더가 없다는 가정하에 개발함.
 export const imageListDeleteS3 = async (imgPath: string) => {
-   const result = await listObjectsV2(imgPath);
+   // const result = await listObjectsV2(imgPath);
    //s3는 폴더를 삭제할수 없기 때문에 폴더내의 이미지리스트를 가져와서  모두 삭제하면 폴더도 사라진다.
-   if (result.success) {
-      // 폴더내의 이미지를 한개씩 개별 삭제
-      result.res.map((filePathName: string) => deleteEditorS3(filePathName));
-   }
+   // if (result.success) {
+   // 폴더내의 이미지를 한개씩 개별 삭제
+   // const deleteObject = result.res.map((filePathName: string) => ({ Key: filePathName }));
+   // console.log('deleteObject', deleteObject);
+   // result.res.map((filePathName: string) => deleteEditorS3(filePathName));
+   // }
 };
 
 // 저장하기 전에 이미지의 처음과 마지막 상태를 비교 체크하여 없는 이미지는 삭제한다.
@@ -71,17 +76,17 @@ export const imgDelCheck = async (value: string, imgDataArr: string[], imgPath: 
    if (result != null) {
       const nowImgArr = result?.map((imgStr) => imgStr.replace('"', '').replace('<img src=', ''));
 
-      // console.log('resultArray', nowImgArr);
+      // console.log('nowImgArr', nowImgArr);
 
       // 추가된 이미지(그리고 기존에 저장된 이미지) 와 현재 저장될 이미지를 비교하여 없는것은 삭제
       let removeArr: string[];
       if (nowImgArr) removeArr = imgDataArr?.filter((imgStr) => !nowImgArr!.includes(imgStr));
       else removeArr = imgDataArr;
       // console.log('removeArr', removeArr);
-      removeArr.map((removeImg) => deleteEditorS3(removeImg)); // 이미지 삭제
+      removeArr.map((removeImg) => deleteS3(removeImg)); // 이미지 1개 삭제
    } else {
-      // 이미지 폴더 삭제 => 폴더내의 모든 이미지리스트 삭제
-      imageListDeleteS3(imgPath);
+      deleteS3(imgPath, false); // 이미지 폴더 삭제 => 폴더내의 모든 이미지리스트 삭제
+      // imageListDeleteS3(imgPath);
    }
 };
 
