@@ -1,6 +1,7 @@
 'use client';
 
 import { getEvent } from '@/app/api/event/get/getEvent';
+import { deleteS3, imageListDeleteS3 } from '@/components/editor/sunEditor/SunEditorCustom.func';
 import HTMLReactParser from 'html-react-parser';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
@@ -19,6 +20,7 @@ export default function EventPageById({ params }: { params: { id: string } }) {
 
    const deleteCheck = async () => {
       if (confirm('글을 정말 삭제하시겠습니까?')) {
+         if (data?.pos) deleteS3(`events/${data.pos}/`, false); // 이미지 폴더 삭제 => 폴더내의 모든 이미지리스트 삭제
          const options = {
             method: 'PUT',
             headers: {
@@ -26,7 +28,7 @@ export default function EventPageById({ params }: { params: { id: string } }) {
             },
             body: JSON.stringify({ id: params.id, del: true }),
          };
-         const data = await fetch('/api/event/del', options).then((res) => {
+         const del = await fetch('/api/event/del', options).then((res) => {
             if (res.status === 200) {
                router.push('/event/list');
             }
