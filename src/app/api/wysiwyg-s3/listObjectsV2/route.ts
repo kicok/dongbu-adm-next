@@ -24,6 +24,8 @@ async function listObjectsS3(dirName: string) {
       // const response = await s3Client.send(command);
       // console.log('response::::', response);
 
+      // https://docs.aws.amazon.com/ko_kr/AmazonS3/latest/userguide/example_s3_ListObjects_section.html
+
       let isTruncated: boolean = true;
 
       let contents: (string | undefined)[] = [];
