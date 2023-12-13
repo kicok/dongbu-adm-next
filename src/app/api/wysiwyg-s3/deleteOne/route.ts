@@ -18,6 +18,7 @@ async function deleteFileToS3(filePathName: string) {
    };
 
    try {
+      //1개의 이미지 개별 삭제
       const command = new DeleteObjectCommand(params);
 
       const response = await s3Client.send(command);
@@ -33,13 +34,13 @@ export async function POST(request: Request) {
       try {
          const formData = await request.formData();
 
-         const fileName = formData.get('filePathName') as string;
+         const filePathName = formData.get('filePathName') as string;
 
-         if (!fileName) {
+         if (!filePathName) {
             return NextResponse.json({ error: 'filePathName is required' }, { status: 400 });
          }
 
-         const res = await deleteFileToS3(fileName);
+         const res = await deleteFileToS3(filePathName);
 
          return NextResponse.json({ success: true, res });
       } catch (error) {
