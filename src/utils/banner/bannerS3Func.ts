@@ -1,4 +1,4 @@
-// S3 이미지 삭제
+// S3 배너 이미지 삭제
 export const deleteBannerS3 = async (fileName: string) => {
    if (!fileName || fileName.split('/').length !== 2) return;
 

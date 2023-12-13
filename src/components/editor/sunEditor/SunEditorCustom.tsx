@@ -43,17 +43,23 @@ const SunEditorCustom = forwardRef<SunEditorCustomType, Props>((props, ref) => {
       SunEditorCustomGetImgPos,
    }));
 
+   // 이미지마다 등록될 경로 (게시글마다 한개의 경로가 생성)
    useEffect(() => {
       if (props.pos) {
          setImpPos(props.pos); // 디비에서 가져온 경로
       }
    }, [props.pos, imgPos]);
 
+   // 외부에서 submit이 실행될때 함수가 실행되어 editor에서 작성된 텍스트를 반환한다.
    const SunEditorCustomGetValue = () => {
       // 저장하기 전에 이미지의 처음과 마지막 상태를 비교 체크하여 없는 이미지는 삭제한다.
+      // handleOnlyImageUploadBefore 함수에서 이미지를 s3에 업로드하고 (추가로직)
+      // handleOnlyImageArrPush 함수에서 imgDataArr 에 이미지를 push 하는 로직이라면 (추가로직)
+      // 이 imgDelCheck 함수는 무조건 삭제만 하는 로직
       const imgPath = props.dirName + '/' + imgPos + '/';
       imgDelCheck(value, imgDataArr, imgPath);
 
+      // editor에서 작성된 텍스트를 반환한다.
       return value;
    };
    const SunEditorCustomGetImgPos = () => imgPos;
@@ -65,7 +71,13 @@ const SunEditorCustom = forwardRef<SunEditorCustomType, Props>((props, ref) => {
 
    getPos(); // 외부에서 props.pos값이 통신 상태에 따라 늦게 전달되므로 값을 계속 전달 받기위해 함수를 실행
 
-   const imageHandler = (
+   // editor가 새로 loading 될때 이미지가 있다면 실행됨 ( state === 'create')
+   // editor에 이미지가 신규 등록될때 ( state === 'create') 실행됨
+   // 실제 s3에 이미지 업로드는 handleImageUploadBefore 함수에서 실행하므로
+   // 이 함수는 setImgDataArr(...) 를 실행하여 "기존 또는 신규로 s3에 등록된 이미지"를 imgDataArr에 push 하는 역할을 담당
+   // 이미지가 editor에서 삭제되면 (state === 'delete') 상태로 함수가 실행되지만 여기서는 이미지 삭제로직을 두지 않는다.
+   // editor를 작성하는 과정에서 이미지 변경(추가,삭제)는 빈번하게 일어날수 있으므로 그때그때마다 삭제 로직을 실행한다면 효율이 떨어질수 있기 때문
+   const handleOnlyImageArrPush = (
       targetImgElement: HTMLImageElement,
       index: number,
       state: 'create' | 'update' | 'delete',
@@ -77,27 +89,29 @@ const SunEditorCustom = forwardRef<SunEditorCustomType, Props>((props, ref) => {
       }
    };
 
-   const uploadingImg = async (files: Array<File>) => {
-      const imgObjArr = await Promise.all(
-         files.map((file, k) => {
-            const formData = new FormData();
-            const newFileName = makeNewFileName(file['name']);
+   // 이미지가 editor에 새로 등록될때마다 실행
+   // 즉 editor에 추가된 이미지를 s3에 추가 업로드 하는 역할을 한다. (이 함수는 업로드만 하고 삭제는 하지 않음)
+   const handleOnlyImageUploadBefore = (files: Array<File>, info: object, uploadHandler: UploadBeforeHandler) => {
+      const uploadingImg = async (files: Array<File>) => {
+         const imgObjArr = await Promise.all(
+            files.map((file, k) => {
+               const formData = new FormData();
+               const newFileName = makeNewFileName(file['name']);
 
-            formData.append('file', file, newFileName);
-            formData.append('position', props.dirName + '/' + imgPos);
+               formData.append('file', file, newFileName);
+               formData.append('position', props.dirName + '/' + imgPos);
 
-            return imgFormUpload(formData);
-         })
-      );
+               return imgFormUpload(formData);
+            })
+         );
 
-      imgObjArr.forEach((imgInfo) => {
-         if (imgInfo.success) {
-            editor.current?.insertHTML(`<img src="${S3Url}${imgInfo.fileName}"/>`, true, true);
-         }
-      });
-   };
+         imgObjArr.forEach((imgInfo) => {
+            if (imgInfo.success) {
+               editor.current?.insertHTML(`<img src="${S3Url}${imgInfo.fileName}"/>`, true, true);
+            }
+         });
+      };
 
-   const handleImageUploadBefore = (files: Array<File>, info: object, uploadHandler: UploadBeforeHandler) => {
       uploadingImg(files);
 
       return false;
@@ -119,8 +133,8 @@ const SunEditorCustom = forwardRef<SunEditorCustomType, Props>((props, ref) => {
             setOptions={{
                buttonList: buttonList,
             }}
-            onImageUpload={imageHandler}
-            onImageUploadBefore={handleImageUploadBefore}
+            onImageUpload={handleOnlyImageArrPush}
+            onImageUploadBefore={handleOnlyImageUploadBefore}
          />
          <button onClick={SunEditorCustomGetValue}>확인</button>
       </div>

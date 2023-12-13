@@ -70,7 +70,9 @@ export const imgDelCheck = async (value: string, imgDataArr: string[], imgPath: 
       removeArr.map((removeImg) => deleteEditorS3(removeImg)); // 이미지 삭제
    } else {
       const result = await listObjectsV2(imgPath);
+      //s3는 폴더를 삭제할수 없기 때문에 폴더내의 이미지리스트를 가져와서 삭제한다.
       if (result.success) {
+         // 폴더내의 이미지를 한개씩 개별 삭제
          result.res.map((filePathName: string) => deleteEditorS3(filePathName));
       }
    }
