@@ -1,12 +1,12 @@
 'use client';
-import React, { useRef, useEffect, forwardRef, useImperativeHandle, useState, useCallback, useMemo } from 'react';
+import React, { useRef, useEffect, forwardRef, useImperativeHandle, useState } from 'react';
 import dynamic from 'next/dynamic';
-// import SunEditor from 'suneditor-react';
-import SunEditorCore, { fileInfo } from 'suneditor/src/lib/core';
+import SunEditorCore from 'suneditor/src/lib/core';
 import 'suneditor/dist/css/suneditor.min.css'; // Import Sun Editor's CSS File
 import { UploadBeforeHandler, UploadInfo } from 'suneditor-react/dist/types/upload';
 import { makeNewFileName, makeRandomStr } from '@/utils/func';
 import { S3Url } from '@/utils/web-initial';
+import { buttonList, imgDelCheck, imgFormUpload } from './SunEditorCustom.func';
 
 const SunEditor = dynamic(() => import('suneditor-react'), {
    ssr: false,
@@ -27,6 +27,7 @@ const SunEditorCustom = forwardRef<SunEditorCustomType, Props>((props, ref) => {
    const editor = useRef<SunEditorCore>();
    const [value, setValue] = useState('');
    const [imgPos, setImpPos] = useState(makeRandomStr(10)); // 새글 작성시 생성
+   const [imgDataArr, setImgDataArr] = useState<string[]>([]);
 
    // The sunEditor parameter will be set to the core suneditor instance when this function is called
    const getSunEditorInstance = (sunEditor: SunEditorCore) => {
@@ -48,7 +49,13 @@ const SunEditorCustom = forwardRef<SunEditorCustomType, Props>((props, ref) => {
       }
    }, [props.pos, imgPos]);
 
-   const SunEditorCustomGetValue = () => value;
+   const SunEditorCustomGetValue = () => {
+      // 저장하기 전에 이미지의 처음과 마지막 상태를 비교 체크하여 없는 이미지는 삭제한다.
+      const imgPath = props.dirName + '/' + imgPos + '/';
+      imgDelCheck(value, imgDataArr, imgPath);
+
+      return value;
+   };
    const SunEditorCustomGetImgPos = () => imgPos;
 
    const getPos = () => {
@@ -58,17 +65,6 @@ const SunEditorCustom = forwardRef<SunEditorCustomType, Props>((props, ref) => {
 
    getPos(); // 외부에서 props.pos값이 통신 상태에 따라 늦게 전달되므로 값을 계속 전달 받기위해 함수를 실행
 
-   const imgFormUpload = async (formData: FormData) => {
-      console.log('formData', formData.get('file'));
-      const response = await fetch('/api/wysiwyg-s3', {
-         method: 'POST',
-         body: formData,
-      });
-
-      if (response.status === 200) return await response.json();
-      else '';
-   };
-
    const imageHandler = (
       targetImgElement: HTMLImageElement,
       index: number,
@@ -76,20 +72,9 @@ const SunEditorCustom = forwardRef<SunEditorCustomType, Props>((props, ref) => {
       imageInfo: UploadInfo<HTMLImageElement>,
       remainingFilesCount: number
    ) => {
-      console.log('targetImgElement', targetImgElement);
-      console.log('index', index);
-      console.log('state', state);
-      console.log('imageInfo', imageInfo);
-      console.log('remainingFilesCount', remainingFilesCount);
-
-      // console.log('imgArr.length ', imgArr.length);
-      if (state === 'delete') {
-         console.log('delete imageInfo src::::', imageInfo);
-         console.log('delete targetImgElement src::::', targetImgElement);
-         console.log('delete index src::::', index);
+      if (state === 'create') {
+         setImgDataArr((prevDataArr) => [...prevDataArr, imageInfo.src]);
       }
-
-      // return;
    };
 
    const uploadingImg = async (files: Array<File>) => {
@@ -123,21 +108,6 @@ const SunEditorCustom = forwardRef<SunEditorCustomType, Props>((props, ref) => {
       // return값에 관계없이 수정페이지에서 이미지 태그가 있을때 처음 로딩시 onImageUpload 는 자동실행되므로 status값에 따라 처리 가능
    };
 
-   const buttonList = [
-      // default
-      ['undo', 'redo'],
-      [':p-More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
-      ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-      ['fontColor', 'hiliteColor', 'textStyle'],
-      ['removeFormat'],
-      ['outdent', 'indent'],
-      // ['imageGallery'],
-      ['align', 'horizontalRule', 'list', 'lineHeight'],
-      ['-right', ':i-More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save'],
-      ['-right', ':r-More Rich-default.more_plus', 'table'],
-      ['-right', 'image', 'video', 'audio', 'link'],
-   ];
-
    return (
       <div>
          <SunEditor
@@ -152,6 +122,7 @@ const SunEditorCustom = forwardRef<SunEditorCustomType, Props>((props, ref) => {
             onImageUpload={imageHandler}
             onImageUploadBefore={handleImageUploadBefore}
          />
+         <button onClick={SunEditorCustomGetValue}>확인</button>
       </div>
    );
 });
