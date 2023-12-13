@@ -52,7 +52,7 @@ export default function EventWrite({ event }: { event?: EventPopup }) {
       //  validate: validator
 
       onSubmit: async (values) => {
-         console.log(JSON.stringify(values));
+         // console.log(JSON.stringify(values));
 
          const options = {
             method: event ? 'PUT' : 'POST',
