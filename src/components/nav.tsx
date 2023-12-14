@@ -22,7 +22,7 @@ const links: NavLink[] = [
    },
    {
       title: '배너관리',
-      href: '/banner/list/1/1',
+      href: '/banner/list',
       // children: [
       //    {
       //       title: 'Web development',
@@ -40,7 +40,7 @@ const links: NavLink[] = [
    },
    {
       title: '이벤트/팝업관리',
-      href: '/event/list/1/1',
+      href: '/event/list',
    },
    {
       title: '가맹안내 문의관리',

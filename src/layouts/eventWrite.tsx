@@ -18,8 +18,8 @@ let validationSchema = object({
 export default function EventWrite({ event }: { event?: EventPopup }) {
    const [dates, setDates] = useState<string[] | undefined>();
    const SunEditRef = useRef<SunEditorCustomType>(null);
-   const [useCheck, setUseCheck] = useState<boolean>(true);
-   const [useCheckMsg, setUseCheckMsg] = useState<string>('사용함');
+   const [unUse, setUnUse] = useState<boolean>(false); // false: 사용함(기본) true: 사용안함
+   const [unUseMsg, setUnUseMsg] = useState<string>('사용함');
    const [pos, setPos] = useState<string>('');
 
    const [content, setContent] = useState<string>('');
@@ -109,7 +109,7 @@ export default function EventWrite({ event }: { event?: EventPopup }) {
          setPos(event.pos);
          setContent(event.content);
          setDates([event.startDate, event.endDate]);
-         setUseCheck(event.useCheck);
+         setUnUse(event.unUse);
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [event]);
@@ -126,16 +126,16 @@ export default function EventWrite({ event }: { event?: EventPopup }) {
       val = val === '<p><br></p>' ? '' : val;
 
       formik.setFieldValue('content', val);
-      formik.setFieldValue('useCheck', useCheck);
+      formik.setFieldValue('unUse', unUse);
       formik.setFieldValue('pos', pos);
    };
 
    useEffect(() => {
-      useCheck ? setUseCheckMsg('사용함') : setUseCheckMsg('사용안함');
-   }, [useCheck]);
+      unUse ? setUnUseMsg('사용안함') : setUnUseMsg('사용함');
+   }, [unUse]);
 
    const handleToggle = () => {
-      setUseCheck((check) => !check);
+      setUnUse((check) => !check);
    };
 
    const dirName = 'events';
@@ -164,7 +164,7 @@ export default function EventWrite({ event }: { event?: EventPopup }) {
                <div className="flex max-md:flex-col">
                   <div className="w-40">사용 여부</div>
                   <div className="w-full">
-                     <Toggle useCheck={useCheck} onChange={handleToggle} msg={useCheckMsg} />
+                     <Toggle unUse={unUse} onChange={handleToggle} msg={unUseMsg} />
                   </div>
                </div>
                <div className="flex max-md:flex-col">

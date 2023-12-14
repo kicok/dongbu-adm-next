@@ -48,7 +48,7 @@ export default function EventPageById({ params }: { params: { id: string } }) {
                <button className="btn btn-primary text-base mx-5" onClick={() => router.push(`/event/modify/${params.id}`)}>
                   글 수정
                </button>
-               <button className="btn btn-primary text-base mx-5" onClick={() => router.push(`/event/list/1/${data?.useCheck ? 1 : ''}`)}>
+               <button className="btn btn-primary text-base mx-5" onClick={() => router.push(`/event/list/1/${data?.unUse ? 1 : ''}`)}>
                   이벤트 리스트
                </button>
             </div>
@@ -56,7 +56,7 @@ export default function EventPageById({ params }: { params: { id: string } }) {
          {data ? (
             <div className="w-full mb-12  border rounded-lg p-10 my-12">
                <div className="tracking-widest text-indigo-500 dark:text-indigo-200 text-xs font-medium title-font">
-                  {data?.useCheck ? '사용함' : '사용안함'}
+                  {data?.unUse ? '사용함' : '사용안함'}
                </div>
                <h1 className="mb-1 text-2xl font-bold  md:leading-tight md:text-3xl">{data?.title}</h1>
                <div className="flex max-md:flex-col mt-2 tracking-widest text-gray-400 dark:text-gray-400 text-xs font-medium title-font">

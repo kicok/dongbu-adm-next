@@ -19,8 +19,8 @@ let validationSchema = object({
 
 export default function BannerWrite({ contents }: { contents?: Banner }) {
    const [dates, setDates] = useState<string[] | undefined>();
-   const [useCheck, setUseCheck] = useState<boolean>(true);
-   const [useCheckMsg, setUseCheckMsg] = useState<string>('사용함');
+   const [unUse, setUnUse] = useState<boolean>(false); // false: 사용함(기본) true: 사용안함
+   const [unUseMsg, setUnUseMsg] = useState<string>('사용함');
 
    const [s3file, setS3file] = useState<string>('');
    const [pos, setPos] = useState<string>('');
@@ -100,7 +100,7 @@ export default function BannerWrite({ contents }: { contents?: Banner }) {
    const submitForm = (e?: React.FormEvent<HTMLFormElement>) => {
       e?.preventDefault();
 
-      // useCheck 값을 가져온다.
+      // unUse 값을 가져온다.
       getContent();
 
       if (dates) {
@@ -127,7 +127,7 @@ export default function BannerWrite({ contents }: { contents?: Banner }) {
          formik.setFieldValue('pos', contents.pos);
          formik.setFieldValue('memo', contents.memo);
          setDates([contents.startDate, contents.endDate]);
-         setUseCheck(contents.useCheck);
+         setUnUse(contents.unUse);
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [contents]);
@@ -141,15 +141,15 @@ export default function BannerWrite({ contents }: { contents?: Banner }) {
       // 글 등록 버튼 onClick 이벤트때 한번
       // 바로 직후 submit 할때 한번 더 ...
 
-      formik.setFieldValue('useCheck', useCheck);
+      formik.setFieldValue('unUse', unUse);
    };
 
    useEffect(() => {
-      useCheck ? setUseCheckMsg('사용함') : setUseCheckMsg('사용안함');
-   }, [useCheck]);
+      unUse ? setUnUseMsg('사용안함') : setUnUseMsg('사용함');
+   }, [unUse]);
 
    const handleToggle = () => {
-      setUseCheck((check) => !check);
+      setUnUse((check) => !check);
    };
 
    const parentToValue = (val: string) => {
@@ -286,7 +286,7 @@ export default function BannerWrite({ contents }: { contents?: Banner }) {
                <div className="flex max-md:flex-col mt-5">
                   <div className="w-40">사용 여부</div>
                   <div className="w-full">
-                     <Toggle useCheck={useCheck} onChange={handleToggle} msg={useCheckMsg} />
+                     <Toggle unUse={unUse} onChange={handleToggle} msg={unUseMsg} />
                   </div>
                </div>
 

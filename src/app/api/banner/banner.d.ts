@@ -7,7 +7,7 @@ type Banner = {
    endDate: string;
    firstname: string;
    flag: string;
-   useCheck: boolean;
+   unUse: boolean;
    lastname: string;
    startDate: string;
    title: string;

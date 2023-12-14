@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
          if (id === 'list') {
             let params: string[] = [];
             params.push('page=' + request.nextUrl.searchParams.get('page'));
-            params.push('useCheck=' + request.nextUrl.searchParams.get('useCheck'));
+            params.push('unUse=' + request.nextUrl.searchParams.get('unUse'));
 
             searchParams = params.join('&');
 
